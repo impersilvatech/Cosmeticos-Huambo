@@ -1,0 +1,979 @@
+<!DOCTYPE html>
+<html lang="pt-AO" data-theme="dark">
+<head>
+<meta charset="UTF-8"><meta name="viewport" content="width=device-width,initial-scale=1.0">
+<title>Admin | Belle Cosméticos</title>
+<link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>👑</text></svg>">
+<script>(function(){document.documentElement.setAttribute('data-theme',localStorage.getItem('bl_theme')||'dark')})()</script>
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
+<link href="https://fonts.googleapis.com/css2?family=Fredoka+One&family=Nunito:wght@400;600;700;800;900&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="belle.css">
+<style>
+body{padding-top:100px;padding-bottom:32px;min-height:100vh}
+
+/* LOGIN */
+#login-screen{position:fixed;inset:0;z-index:500;background:var(--bg);display:flex;flex-direction:column;align-items:center;justify-content:center;padding:30px 20px;text-align:center}
+.login-logo{font-family:var(--ff);font-size:2rem;background:var(--grad);-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text;margin-bottom:4px}
+.login-sub{font-size:.84rem;color:var(--muted);margin-bottom:30px}
+.pin-dots{display:flex;gap:14px;justify-content:center;margin-bottom:24px}
+.pin-dot{width:18px;height:18px;border-radius:50%;border:2px solid var(--border);transition:var(--tr);background:transparent}
+.pin-dot.filled{background:var(--pink);border-color:var(--pink)}
+.pin-dot.err{background:var(--red);border-color:var(--red);animation:shake .3s ease}
+@keyframes shake{0%,100%{transform:translateX(0)}25%{transform:translateX(-4px)}75%{transform:translateX(4px)}}
+.numpad{display:grid;grid-template-columns:repeat(3,1fr);gap:10px;max-width:240px;margin:0 auto 16px}
+.np-btn{height:62px;border-radius:16px;background:var(--card);border:1px solid var(--border);font-family:var(--ff);font-size:1.4rem;cursor:pointer;transition:var(--tr);display:flex;align-items:center;justify-content:center;color:var(--text)}
+.np-btn:active{transform:scale(.92);border-color:var(--pink);background:rgba(232,96,154,.1)}
+.np-btn.del{font-size:.9rem;color:var(--muted)}
+.login-hint{font-size:.7rem;color:var(--muted)}
+
+/* HEADER */
+.adm-hdr{position:fixed;top:0;left:0;right:0;z-index:100;height:54px;display:flex;align-items:center;justify-content:space-between;padding:0 16px;background:var(--glass);backdrop-filter:blur(20px);border-bottom:1px solid var(--border)}
+.adm-logo{font-family:var(--ff);font-size:1.2rem;background:var(--grad);-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text}
+.adm-hdr-actions{display:flex;gap:6px;align-items:center}
+
+/* TABS */
+.tabs-bar{position:fixed;top:54px;left:0;right:0;z-index:99;overflow-x:auto;scrollbar-width:none;background:var(--bg2);border-bottom:1px solid var(--border)}
+.tabs-bar::-webkit-scrollbar{display:none}
+.tabs-inner{display:flex;width:max-content;padding:0 10px}
+.adm-tab{padding:11px 14px;border:none;background:none;font-family:var(--fb);font-size:.72rem;font-weight:700;color:var(--muted);border-bottom:2px solid transparent;cursor:pointer;white-space:nowrap;transition:var(--tr);display:flex;align-items:center;gap:5px}
+.adm-tab i{font-size:.7rem}
+.adm-tab.on{color:var(--pink);border-bottom-color:var(--pink)}
+.tab-content{display:none;padding:16px}
+.tab-content.on{display:block}
+.tab-title{font-family:var(--ff);font-size:1.2rem;color:var(--text);margin-bottom:16px;display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:8px}
+
+/* STATS GRID */
+.stats-grid{display:grid;grid-template-columns:repeat(2,1fr);gap:10px;margin-bottom:18px}
+.sc{background:var(--card);border:1px solid var(--border);border-radius:var(--r);padding:16px;position:relative;overflow:hidden}
+.sc-ico{font-size:1.5rem;margin-bottom:8px}
+.sc-val{font-family:var(--ff);font-size:1.7rem;color:var(--pink);line-height:1;margin-bottom:3px}
+.sc-lbl{font-size:.65rem;font-weight:700;text-transform:uppercase;letter-spacing:.4px;color:var(--muted)}
+.sc-bg{position:absolute;bottom:-12px;right:-4px;font-size:4rem;opacity:.04;pointer-events:none}
+
+/* ITEM ROWS */
+.item-row{background:var(--card);border:1px solid var(--border);border-radius:var(--r);padding:14px;margin-bottom:10px;transition:var(--tr)}
+.item-row:hover{border-color:rgba(232,96,154,.25)}
+.item-row-hdr{display:flex;align-items:center;justify-content:space-between;margin-bottom:6px;gap:8px}
+.item-row-title{font-size:.88rem;font-weight:700;flex:1;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.item-row-sub{font-size:.74rem;color:var(--muted)}
+.item-row-actions{display:flex;gap:6px;flex-shrink:0}
+
+/* PRODUCT ROW */
+.prod-row{background:var(--card);border:1px solid var(--border);border-radius:var(--r);padding:12px;margin-bottom:10px;display:flex;gap:12px;align-items:flex-start;transition:var(--tr)}
+.prod-row:hover{border-color:rgba(232,96,154,.25)}
+.pr-img{width:56px;height:56px;border-radius:10px;background:var(--bg2);display:flex;align-items:center;justify-content:center;font-size:1.6rem;flex-shrink:0;overflow:hidden}
+.pr-img img{width:100%;height:100%;object-fit:cover}
+.pr-info{flex:1;min-width:0}
+.pr-name{font-size:.86rem;font-weight:700;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;margin-bottom:2px}
+.pr-meta{font-size:.7rem;color:var(--muted);margin-bottom:4px}
+.pr-tags{display:flex;gap:4px;flex-wrap:wrap}
+.pr-price{font-family:var(--ff);font-size:.92rem;color:var(--pink)}
+.pr-actions{display:flex;flex-direction:column;gap:6px;align-items:flex-end;flex-shrink:0}
+.inactive-overlay{opacity:.5}
+
+/* ORDER ROW */
+.ord-row{background:var(--card);border:1px solid var(--border);border-radius:var(--r);padding:14px;margin-bottom:10px;cursor:pointer;transition:var(--tr)}
+.ord-row:hover{border-color:rgba(232,96,154,.3)}
+.ord-hdr{display:flex;align-items:center;justify-content:space-between;margin-bottom:5px}
+.ord-ref{font-family:var(--ff);font-size:.9rem;color:var(--pink)}
+.ord-client{font-size:.8rem;font-weight:600;margin-bottom:2px}
+.ord-meta{display:flex;justify-content:space-between;font-size:.72rem;color:var(--muted)}
+.ord-total{font-family:var(--ff);font-weight:700;color:var(--text);font-size:.88rem}
+
+/* FILTER BAR */
+.filter-bar{display:flex;gap:8px;overflow-x:auto;scrollbar-width:none;margin-bottom:14px;padding-bottom:2px}
+.filter-bar::-webkit-scrollbar{display:none}
+.fb-btn{padding:7px 14px;border:1px solid var(--border);border-radius:50px;font-size:.72rem;font-weight:700;color:var(--muted);cursor:pointer;white-space:nowrap;background:none;transition:var(--tr)}
+.fb-btn.on{border-color:var(--pink);color:var(--pink);background:rgba(232,96,154,.07)}
+
+/* MODAL */
+.modal-bg{position:fixed;inset:0;z-index:400;background:rgba(0,0,0,.75);display:none;align-items:flex-end}
+.modal-bg.on{display:flex}
+.modal-box{width:100%;background:var(--bg2);border-radius:24px 24px 0 0;padding:20px 16px 48px;max-height:92vh;overflow-y:auto}
+.modal-hdr{display:flex;align-items:center;justify-content:space-between;margin-bottom:20px}
+.modal-title{font-family:var(--ff);font-size:1.2rem;color:var(--text)}
+.modal-close{width:32px;height:32px;border-radius:50%;background:var(--card);border:1px solid var(--border);display:flex;align-items:center;justify-content:center;cursor:pointer;font-size:.85rem}
+
+/* SECTION GROUPS */
+.sgroup{background:rgba(232,96,154,.04);border:1px solid rgba(232,96,154,.12);border-radius:14px;padding:14px;margin-bottom:14px}
+.sgroup-title{font-size:.68rem;font-weight:700;text-transform:uppercase;letter-spacing:.6px;color:var(--pink);margin-bottom:12px;display:flex;align-items:center;gap:6px}
+.sgroup-title i{font-size:.65rem}
+
+/* ORDERED LIST */
+.ord-list-item{display:flex;align-items:center;gap:10px;background:var(--card);border:1px solid var(--border);border-radius:10px;padding:10px 12px;margin-bottom:8px}
+.oli-handle{color:var(--muted);font-size:.8rem;cursor:grab}
+.oli-content{flex:1;font-size:.84rem;font-weight:600;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.oli-actions{display:flex;gap:5px}
+
+/* INFO BOX */
+.info-box{background:rgba(6,214,160,.06);border:1px solid rgba(6,214,160,.15);border-radius:12px;padding:12px 14px;font-size:.78rem;color:var(--teal);line-height:1.65;margin-bottom:14px}
+.warn-box{background:rgba(255,209,102,.06);border:1px solid rgba(255,209,102,.15);border-radius:12px;padding:12px 14px;font-size:.78rem;color:var(--yellow);line-height:1.65;margin-bottom:14px}
+
+/* INLINE TOGGLE */
+.row-toggle{display:flex;align-items:center;justify-content:space-between;padding:10px 0;border-bottom:1px solid var(--border)}
+.row-toggle:last-child{border-bottom:none}
+.rt-lbl{font-size:.84rem;font-weight:600}
+.rt-sub{font-size:.72rem;color:var(--muted);margin-top:2px}
+
+/* TEXTAREA large */
+.ta-lg{min-height:120px}
+.ta-xl{min-height:180px}
+
+/* img preview */
+.img-preview{width:80px;height:80px;border-radius:12px;object-fit:cover;border:1px solid var(--border);display:none}
+.img-preview.show{display:block}
+</style>
+</head>
+<body>
+
+<!-- ─── LOGIN ─────────────────────────────── -->
+<div id="login-screen">
+  <div style="font-size:3rem;margin-bottom:8px">👑</div>
+  <div class="login-logo">Belle Admin</div>
+  <div class="login-sub">Introduza o PIN de administração</div>
+  <div class="pin-dots" id="pin-dots">
+    <div class="pin-dot" id="pd0"></div><div class="pin-dot" id="pd1"></div>
+    <div class="pin-dot" id="pd2"></div><div class="pin-dot" id="pd3"></div>
+  </div>
+  <div class="numpad">
+    <button class="np-btn" onclick="np(1)">1</button><button class="np-btn" onclick="np(2)">2</button><button class="np-btn" onclick="np(3)">3</button>
+    <button class="np-btn" onclick="np(4)">4</button><button class="np-btn" onclick="np(5)">5</button><button class="np-btn" onclick="np(6)">6</button>
+    <button class="np-btn" onclick="np(7)">7</button><button class="np-btn" onclick="np(8)">8</button><button class="np-btn" onclick="np(9)">9</button>
+    <div></div><button class="np-btn" onclick="np(0)">0</button><button class="np-btn del" onclick="npDel()"><i class="fa-solid fa-delete-left"></i></button>
+  </div>
+  <div class="login-hint">PIN padrão: <strong>1234</strong></div>
+</div>
+
+<!-- ─── ADMIN PANEL ────────────────────────── -->
+<div id="admin-panel" style="display:none">
+
+  <header class="adm-hdr">
+    <div class="adm-logo">Belle Admin</div>
+    <div class="adm-hdr-actions">
+      <button class="nav-btn" onclick="Theme.toggle()"><i data-theme-ico class="fa-solid fa-moon"></i></button>
+      <a href="index.html" target="_blank" class="nav-btn" title="Ver site"><i class="fa-solid fa-store"></i></a>
+      <button class="nav-btn" onclick="doLogout()" title="Sair" style="color:var(--red)"><i class="fa-solid fa-right-from-bracket"></i></button>
+    </div>
+  </header>
+
+  <div class="tabs-bar">
+    <div class="tabs-inner">
+      <button class="adm-tab on"  onclick="setTab('painel')"><i class="fa-solid fa-chart-line"></i>Painel</button>
+      <button class="adm-tab" onclick="setTab('pedidos')"><i class="fa-solid fa-bag-shopping"></i>Pedidos</button>
+      <button class="adm-tab" onclick="setTab('produtos')"><i class="fa-solid fa-box-open"></i>Produtos</button>
+      <button class="adm-tab" onclick="setTab('categorias')"><i class="fa-solid fa-tags"></i>Categorias</button>
+      <button class="adm-tab" onclick="setTab('homepage')"><i class="fa-solid fa-house"></i>Homepage</button>
+      <button class="adm-tab" onclick="setTab('depoimentos')"><i class="fa-solid fa-star"></i>Depoimentos</button>
+      <button class="adm-tab" onclick="setTab('features')"><i class="fa-solid fa-list-check"></i>Porquê Belle</button>
+      <button class="adm-tab" onclick="setTab('sobre')"><i class="fa-solid fa-circle-info"></i>Sobre</button>
+      <button class="adm-tab" onclick="setTab('loja')"><i class="fa-solid fa-gear"></i>Loja</button>
+      <button class="adm-tab" onclick="setTab('config')"><i class="fa-solid fa-plug"></i>Config API</button>
+      <button class="adm-tab" onclick="setTab('pin')"><i class="fa-solid fa-lock"></i>PIN</button>
+    </div>
+  </div>
+
+  <!-- ═══ PAINEL ═══════════════════════════ -->
+  <div class="tab-content on" id="tab-painel">
+    <div class="tab-title">Painel <span style="font-family:var(--fb);font-size:.78rem;color:var(--muted);font-weight:400" id="dash-date"></span></div>
+    <div class="stats-grid">
+      <div class="sc"><div class="sc-ico">⏳</div><div class="sc-val" id="st-pend">–</div><div class="sc-lbl">Pendentes</div><div class="sc-bg">⏳</div></div>
+      <div class="sc"><div class="sc-ico">📦</div><div class="sc-val" id="st-tot">–</div><div class="sc-lbl">Total pedidos</div><div class="sc-bg">📦</div></div>
+      <div class="sc"><div class="sc-ico">💰</div><div class="sc-val" id="st-rev">–</div><div class="sc-lbl">Receita (Kz)</div><div class="sc-bg">💰</div></div>
+      <div class="sc"><div class="sc-ico">👥</div><div class="sc-val" id="st-cli">–</div><div class="sc-lbl">Clientes únicos</div><div class="sc-bg">👥</div></div>
+    </div>
+    <div style="font-size:.78rem;font-weight:700;margin-bottom:10px;color:var(--muted);text-transform:uppercase;letter-spacing:.4px">Últimos pedidos</div>
+    <div id="dash-orders"></div>
+    <div style="margin-top:16px;display:flex;gap:8px;flex-wrap:wrap">
+      <button class="btn-ghost btn-sm" onclick="setTab('pedidos')"><i class="fa-solid fa-bag-shopping"></i> Ver todos os pedidos</button>
+      <button class="btn-ghost btn-sm" onclick="setTab('produtos')"><i class="fa-solid fa-box-open"></i> Gestão de produtos</button>
+    </div>
+  </div>
+
+  <!-- ═══ PEDIDOS ═══════════════════════════ -->
+  <div class="tab-content" id="tab-pedidos">
+    <div class="tab-title">Pedidos</div>
+    <div class="filter-bar" id="ord-filter-bar">
+      <button class="fb-btn on" onclick="filterOrds('all',this)">Todos</button>
+      <button class="fb-btn" onclick="filterOrds('pending',this)">⏳ Pendentes</button>
+      <button class="fb-btn" onclick="filterOrds('confirmed',this)">✅ Confirmados</button>
+      <button class="fb-btn" onclick="filterOrds('shipped',this)">🚚 Em entrega</button>
+      <button class="fb-btn" onclick="filterOrds('delivered',this)">📦 Entregues</button>
+      <button class="fb-btn" onclick="filterOrds('cancelled',this)">❌ Cancelados</button>
+    </div>
+    <input class="form-input mb-12" type="text" placeholder="🔍 Pesquisar por referência ou cliente..." oninput="searchOrds(this.value)">
+    <div id="ords-list"></div>
+  </div>
+
+  <!-- ═══ PRODUTOS ════════════════════════════ -->
+  <div class="tab-content" id="tab-produtos">
+    <div class="tab-title">
+      Produtos
+      <button class="btn-primary btn-sm" onclick="openProdModal(null)"><i class="fa-solid fa-plus"></i> Novo produto</button>
+    </div>
+    <div class="filter-bar" id="prod-filter-bar">
+      <button class="fb-btn on" onclick="filterProds('all',this)">Todos</button>
+      <button class="fb-btn" onclick="filterProds('active',this)">✅ Activos</button>
+      <button class="fb-btn" onclick="filterProds('featured',this)">⭐ Destaque</button>
+      <button class="fb-btn" onclick="filterProds('lowstock',this)">⚠️ Stock baixo</button>
+      <button class="fb-btn" onclick="filterProds('inactive',this)">🚫 Inactivos</button>
+    </div>
+    <input class="form-input mb-12" type="text" placeholder="🔍 Pesquisar produto..." id="prod-search" oninput="renderProds()">
+    <div id="prods-list"></div>
+  </div>
+
+  <!-- ═══ CATEGORIAS ═══════════════════════════ -->
+  <div class="tab-content" id="tab-categorias">
+    <div class="tab-title">
+      Categorias
+      <button class="btn-primary btn-sm" onclick="openCatModal(null)"><i class="fa-solid fa-plus"></i> Nova categoria</button>
+    </div>
+    <div class="info-box">💡 As categorias organizam os produtos no catálogo. Pode activar/desactivar, reordenar e editar nome, emoji e cor.</div>
+    <div id="cats-list"></div>
+  </div>
+
+  <!-- ═══ HOMEPAGE ════════════════════════════ -->
+  <div class="tab-content" id="tab-homepage">
+    <div class="tab-title">Editor da Homepage</div>
+    <div class="info-box">✏️ Edite aqui todos os textos e conteúdos que aparecem na página inicial do site. As alterações são aplicadas em tempo real.</div>
+
+    <div class="sgroup">
+      <div class="sgroup-title"><i class="fa-solid fa-megaphone"></i> Banner de topo</div>
+      <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:10px">
+        <div><div class="rt-lbl">Mostrar banner</div><div class="rt-sub">Barra de promoção no topo da página</div></div>
+        <label class="switch"><input type="checkbox" id="hm-ann-active" onchange="saveHomeSec()"><span class="switch-slider"></span></label>
+      </div>
+      <div class="form-group"><label class="form-label">Texto do banner</label><input class="form-input" id="hm-ann-text" type="text" placeholder="🎁 Entrega grátis acima de 10.000 Kz!" oninput="saveHomeSec()"></div>
+    </div>
+
+    <div class="sgroup">
+      <div class="sgroup-title"><i class="fa-solid fa-star"></i> Secção Hero (Ecrã principal)</div>
+      <div class="form-group"><label class="form-label">Badge <small>texto da bolha em cima do título</small></label><input class="form-input" id="hm-h-badge" type="text" oninput="saveHomeSec()"></div>
+      <div class="form-group"><label class="form-label">Título principal <small>quebra de linha com Enter</small></label><textarea class="form-input" id="hm-h-title" rows="2" oninput="saveHomeSec()"></textarea></div>
+      <div class="form-group"><label class="form-label">Subtítulo / Slogan</label><textarea class="form-input" id="hm-h-sub" rows="2" oninput="saveHomeSec()"></textarea></div>
+      <div class="form-group"><label class="form-label">Texto botão principal</label><input class="form-input" id="hm-h-btn1" type="text" oninput="saveHomeSec()"></div>
+      <div class="form-group"><label class="form-label">Texto botão secundário</label><input class="form-input" id="hm-h-btn2" type="text" oninput="saveHomeSec()"></div>
+    </div>
+
+    <div class="sgroup">
+      <div class="sgroup-title"><i class="fa-solid fa-chart-bar"></i> Contadores de estatísticas</div>
+      <div id="stats-editor"></div>
+      <button class="btn-ghost btn-sm mt-8" onclick="addStat()"><i class="fa-solid fa-plus"></i> Adicionar estatística</button>
+    </div>
+
+    <div class="sgroup">
+      <div class="sgroup-title"><i class="fa-solid fa-tags"></i> Secção de categorias</div>
+      <div class="form-group"><label class="form-label">Badge</label><input class="form-input" id="hm-cs-badge" type="text" oninput="saveHomeSec()"></div>
+      <div class="form-group"><label class="form-label">Título <small>última linha em destaque</small></label><textarea class="form-input" id="hm-cs-title" rows="2" oninput="saveHomeSec()"></textarea></div>
+      <div class="form-group"><label class="form-label">Subtítulo</label><input class="form-input" id="hm-cs-sub" type="text" oninput="saveHomeSec()"></div>
+    </div>
+
+    <div class="sgroup">
+      <div class="sgroup-title"><i class="fa-solid fa-circle-check"></i> Secção "Porquê Belle"</div>
+      <div class="form-group"><label class="form-label">Badge</label><input class="form-input" id="hm-fs-badge" type="text" oninput="saveHomeSec()"></div>
+      <div class="form-group"><label class="form-label">Título <small>última linha em destaque</small></label><textarea class="form-input" id="hm-fs-title" rows="2" oninput="saveHomeSec()"></textarea></div>
+    </div>
+
+    <div class="sgroup">
+      <div class="sgroup-title"><i class="fa-solid fa-star"></i> Secção de depoimentos</div>
+      <div class="form-group"><label class="form-label">Badge</label><input class="form-input" id="hm-ds-badge" type="text" oninput="saveHomeSec()"></div>
+      <div class="form-group"><label class="form-label">Título <small>última linha em destaque</small></label><textarea class="form-input" id="hm-ds-title" rows="2" oninput="saveHomeSec()"></textarea></div>
+    </div>
+
+    <div class="sgroup">
+      <div class="sgroup-title"><i class="fa-solid fa-bullhorn"></i> Secção CTA (chamada à acção)</div>
+      <div class="form-group"><label class="form-label">Emoji decorativo</label><input class="form-input" id="hm-cta-emoji" type="text" maxlength="4" oninput="saveHomeSec()"></div>
+      <div class="form-group"><label class="form-label">Título <small>última linha em destaque</small></label><textarea class="form-input" id="hm-cta-title" rows="2" oninput="saveHomeSec()"></textarea></div>
+      <div class="form-group"><label class="form-label">Subtítulo</label><textarea class="form-input" id="hm-cta-sub" rows="2" oninput="saveHomeSec()"></textarea></div>
+      <div class="form-group"><label class="form-label">Texto do botão</label><input class="form-input" id="hm-cta-btn" type="text" oninput="saveHomeSec()"></div>
+    </div>
+  </div>
+
+  <!-- ═══ DEPOIMENTOS ════════════════════════ -->
+  <div class="tab-content" id="tab-depoimentos">
+    <div class="tab-title">
+      Depoimentos
+      <button class="btn-primary btn-sm" onclick="openDepModal(null,-1)"><i class="fa-solid fa-plus"></i> Adicionar</button>
+    </div>
+    <div class="info-box">⭐ Os depoimentos aparecem na página inicial e na página "Sobre". Adicione avaliações reais das clientes.</div>
+    <div id="deps-list"></div>
+  </div>
+
+  <!-- ═══ FEATURES ══════════════════════════ -->
+  <div class="tab-content" id="tab-features">
+    <div class="tab-title">
+      Porquê Belle
+      <button class="btn-primary btn-sm" onclick="openFeatModal(null,-1)"><i class="fa-solid fa-plus"></i> Adicionar</button>
+    </div>
+    <div class="info-box">✅ Estes cartões aparecem na secção "Porquê Belle" da homepage. Destacam os benefícios de comprar na Belle.</div>
+    <div id="feats-list"></div>
+  </div>
+
+  <!-- ═══ SOBRE ═════════════════════════════ -->
+  <div class="tab-content" id="tab-sobre">
+    <div class="tab-title">Página "Sobre Nós"</div>
+    <div class="sgroup">
+      <div class="sgroup-title"><i class="fa-solid fa-star"></i> Hero da página Sobre</div>
+      <div class="form-group"><label class="form-label">Título <small>última linha em destaque</small></label><textarea class="form-input" id="sb-hero-title" rows="2"></textarea></div>
+      <div class="form-group"><label class="form-label">Subtítulo</label><textarea class="form-input" id="sb-hero-sub" rows="2"></textarea></div>
+    </div>
+    <div class="sgroup">
+      <div class="sgroup-title"><i class="fa-solid fa-quote-left"></i> Citação / Missão</div>
+      <div class="form-group"><label class="form-label">Texto da missão</label><textarea class="form-input ta-lg" id="sb-mission"></textarea></div>
+    </div>
+    <div class="sgroup">
+      <div class="sgroup-title"><i class="fa-solid fa-book"></i> História</div>
+      <div class="form-group"><label class="form-label">Texto da história da empresa</label><textarea class="form-input ta-xl" id="sb-story"></textarea></div>
+    </div>
+    <div class="sgroup">
+      <div class="sgroup-title"><i class="fa-solid fa-chart-bar"></i> Estatísticas da página Sobre</div>
+      <div id="sb-stats-editor"></div>
+    </div>
+    <div class="sgroup">
+      <div class="sgroup-title"><i class="fa-solid fa-circle-question"></i> FAQ</div>
+      <div id="faq-editor"></div>
+      <button class="btn-ghost btn-sm mt-8" onclick="addFaq()"><i class="fa-solid fa-plus"></i> Adicionar pergunta</button>
+    </div>
+    <button class="btn-primary w-full mt-16" onclick="saveSobre()"><i class="fa-solid fa-floppy-disk"></i> Guardar alterações</button>
+  </div>
+
+  <!-- ═══ LOJA ══════════════════════════════ -->
+  <div class="tab-content" id="tab-loja">
+    <div class="tab-title">Definições da Loja</div>
+    <div class="sgroup">
+      <div class="sgroup-title"><i class="fa-solid fa-store"></i> Informação básica</div>
+      <div class="form-group"><label class="form-label">Nome da loja</label><input class="form-input" id="lj-nome" type="text"></div>
+      <div class="form-group"><label class="form-label">Slogan / Tagline</label><input class="form-input" id="lj-slogan" type="text"></div>
+      <div class="form-group"><label class="form-label">Email de contacto</label><input class="form-input" id="lj-email" type="email"></div>
+      <div class="form-group"><label class="form-label">Telefone</label><input class="form-input" id="lj-tel" type="tel"></div>
+      <div class="form-group"><label class="form-label">WhatsApp (com código do país)</label><input class="form-input" id="lj-wa" type="tel" placeholder="244923000000"></div>
+      <div class="form-group"><label class="form-label">Morada</label><input class="form-input" id="lj-morada" type="text"></div>
+      <div class="form-group"><label class="form-label">Moeda</label><input class="form-input" id="lj-moeda" type="text" placeholder="Kz"></div>
+    </div>
+    <div class="sgroup">
+      <div class="sgroup-title"><i class="fa-solid fa-truck"></i> Entregas</div>
+      <div class="form-group"><label class="form-label">Taxa de entrega (Kz)</label><input class="form-input" id="lj-delivery" type="number" min="0"></div>
+      <div class="form-group"><label class="form-label">Entrega gratuita acima de (Kz, 0 = desactivado)</label><input class="form-input" id="lj-free" type="number" min="0"></div>
+    </div>
+    <div class="sgroup">
+      <div class="sgroup-title"><i class="fa-solid fa-share-nodes"></i> Redes sociais</div>
+      <div class="form-group"><label class="form-label">Instagram <small>@username</small></label><input class="form-input" id="lj-ig" type="text" placeholder="@bellecosmeticos.ao"></div>
+      <div class="form-group"><label class="form-label">Facebook <small>URL ou nome da página</small></label><input class="form-input" id="lj-fb" type="text"></div>
+      <div class="form-group"><label class="form-label">TikTok <small>@username</small></label><input class="form-input" id="lj-tt" type="text"></div>
+    </div>
+    <button class="btn-primary w-full" onclick="saveLoja()"><i class="fa-solid fa-floppy-disk"></i> Guardar alterações</button>
+  </div>
+
+  <!-- ═══ CONFIG API ════════════════════════ -->
+  <div class="tab-content" id="tab-config">
+    <div class="tab-title">Configuração da API</div>
+    <div class="warn-box">⚠️ Modo Demo activo. Os dados são guardados localmente no browser. Configure o Cloudflare Worker abaixo para activar a API real com base de dados persistente.</div>
+    <div class="sgroup">
+      <div class="sgroup-title"><i class="fa-solid fa-cloud"></i> Cloudflare Worker</div>
+      <div class="form-group"><label class="form-label">URL da API</label><input class="form-input" id="cf-api" type="url" placeholder="https://api.belle.workers.dev"></div>
+      <div class="form-group"><label class="form-label">Token secreto (Bearer)</label><input class="form-input" id="cf-token" type="password"></div>
+    </div>
+    <div class="sgroup">
+      <div class="sgroup-title"><i class="fa-brands fa-github"></i> GitHub (upload de imagens)</div>
+      <div class="form-group"><label class="form-label">Repositório <small>user/repo</small></label><input class="form-input" id="gh-repo" type="text" placeholder="username/belle-cosmeticos"></div>
+      <div class="form-group"><label class="form-label">Branch</label><input class="form-input" id="gh-branch" type="text" placeholder="main"></div>
+      <div class="form-group"><label class="form-label">GitHub Token <small>ghp_...</small></label><input class="form-input" id="gh-token" type="password"></div>
+      <div class="form-group"><label class="form-label">Pasta de imagens</label><input class="form-input" id="gh-imgpath" type="text" placeholder="img/products/"></div>
+    </div>
+    <div class="sgroup">
+      <div class="sgroup-title"><i class="fa-brands fa-whatsapp"></i> CallMeBot (WhatsApp)</div>
+      <div class="form-group"><label class="form-label">Número de destino</label><input class="form-input" id="wa-phone" type="tel" placeholder="+244923000000"></div>
+      <div class="form-group"><label class="form-label">API Key</label><input class="form-input" id="wa-key" type="text"></div>
+    </div>
+    <div class="sgroup">
+      <div class="sgroup-title"><i class="fa-regular fa-envelope"></i> EmailJS</div>
+      <div class="form-group"><label class="form-label">Service ID</label><input class="form-input" id="ej-svc" type="text" placeholder="service_xxx"></div>
+      <div class="form-group"><label class="form-label">Template ID</label><input class="form-input" id="ej-tpl" type="text" placeholder="template_xxx"></div>
+      <div class="form-group"><label class="form-label">Public Key</label><input class="form-input" id="ej-key" type="text"></div>
+    </div>
+    <button class="btn-primary w-full" onclick="saveConfig()"><i class="fa-solid fa-floppy-disk"></i> Guardar configurações</button>
+  </div>
+
+  <!-- ═══ PIN ═══════════════════════════════ -->
+  <div class="tab-content" id="tab-pin">
+    <div class="tab-title">Alterar PIN</div>
+    <div class="warn-box">🔐 O PIN protege o acesso ao painel de administração. Use um PIN de 4 dígitos que apenas você saiba.</div>
+    <div class="form-group"><label class="form-label">PIN actual</label><input class="form-input" id="pin-old" type="password" maxlength="4" inputmode="numeric"></div>
+    <div class="form-group"><label class="form-label">Novo PIN (4 dígitos)</label><input class="form-input" id="pin-new" type="password" maxlength="4" inputmode="numeric"></div>
+    <div class="form-group"><label class="form-label">Confirmar novo PIN</label><input class="form-input" id="pin-conf" type="password" maxlength="4" inputmode="numeric"></div>
+    <button class="btn-primary w-full" onclick="doChangePin()"><i class="fa-solid fa-lock"></i> Actualizar PIN</button>
+  </div>
+
+</div><!-- /admin-panel -->
+
+<!-- ═══ MODALS ══════════════════════════════════════ -->
+
+<!-- Order detail modal -->
+<div class="modal-bg" id="ord-modal">
+  <div class="modal-box">
+    <div class="modal-hdr"><div class="modal-title">Detalhe do Pedido</div><button class="modal-close" onclick="closeModal('ord-modal')"><i class="fa-solid fa-xmark"></i></button></div>
+    <div id="ord-detail"></div>
+  </div>
+</div>
+
+<!-- Product modal -->
+<div class="modal-bg" id="prod-modal">
+  <div class="modal-box">
+    <div class="modal-hdr"><div class="modal-title" id="prod-modal-title">Produto</div><button class="modal-close" onclick="closeModal('prod-modal')"><i class="fa-solid fa-xmark"></i></button></div>
+    <div id="prod-form-area"></div>
+  </div>
+</div>
+
+<!-- Category modal -->
+<div class="modal-bg" id="cat-modal">
+  <div class="modal-box">
+    <div class="modal-hdr"><div class="modal-title" id="cat-modal-title">Categoria</div><button class="modal-close" onclick="closeModal('cat-modal')"><i class="fa-solid fa-xmark"></i></button></div>
+    <div id="cat-form-area"></div>
+  </div>
+</div>
+
+<!-- Testimonial modal -->
+<div class="modal-bg" id="dep-modal">
+  <div class="modal-box">
+    <div class="modal-hdr"><div class="modal-title">Depoimento</div><button class="modal-close" onclick="closeModal('dep-modal')"><i class="fa-solid fa-xmark"></i></button></div>
+    <div id="dep-form-area"></div>
+  </div>
+</div>
+
+<!-- Feature modal -->
+<div class="modal-bg" id="feat-modal">
+  <div class="modal-box">
+    <div class="modal-hdr"><div class="modal-title">Destaque</div><button class="modal-close" onclick="closeModal('feat-modal')"><i class="fa-solid fa-xmark"></i></button></div>
+    <div id="feat-form-area"></div>
+  </div>
+</div>
+
+<div id="bl-toast"></div>
+<script src="belle.js"></script>
+<script>
+/* ══════════════════════════════════
+   PIN LOGIN
+══════════════════════════════════ */
+let _pin = '';
+function np(d){ if(_pin.length>=4)return; _pin+=d; syncDots(); if(_pin.length===4)setTimeout(verifyPin,200); }
+function npDel(){ _pin=_pin.slice(0,-1); syncDots(); }
+function syncDots(err=false){ for(let i=0;i<4;i++){ const d=document.getElementById('pd'+i); d.classList.toggle('filled',i<_pin.length); d.classList.toggle('err',err&&i<4); } }
+function verifyPin(){
+  if(Settings.verifyPin(_pin)){ Auth.set('admin_'+Date.now()); document.getElementById('login-screen').style.display='none'; document.getElementById('admin-panel').style.display='block'; initAdmin(); }
+  else{ syncDots(true); setTimeout(()=>{ _pin=''; syncDots(); },800); toast('PIN incorrecto','err'); }
+}
+function doLogout(){ Auth.clear(); location.reload(); }
+
+/* ══════════════════════════════════
+   TAB
+══════════════════════════════════ */
+function setTab(name){
+  document.querySelectorAll('.tab-content').forEach(s=>s.classList.remove('on'));
+  document.querySelectorAll('.adm-tab').forEach(b=>b.classList.remove('on'));
+  document.getElementById('tab-'+name).classList.add('on');
+  document.querySelectorAll('.adm-tab').forEach(b=>{ if(b.getAttribute('onclick')?.includes("'"+name+"'"))b.classList.add('on'); });
+  const lazy = { pedidos:loadOrders, produtos:renderProds, categorias:renderCats, depoimentos:renderDeps, features:renderFeats };
+  if(lazy[name]) lazy[name]();
+}
+
+/* ══════════════════════════════════
+   INIT
+══════════════════════════════════ */
+function initAdmin(){
+  Theme.init();
+  loadDash();
+  loadHomeEditor();
+  loadLojaEditor();
+  loadSobreEditor();
+  loadConfigEditor();
+  document.getElementById('dash-date').textContent = fmtDate(new Date().toISOString());
+}
+
+/* ══════════════════════════════════
+   DASHBOARD
+══════════════════════════════════ */
+function loadDash(){
+  const s = Orders.stats();
+  document.getElementById('st-pend').textContent = s.pending;
+  document.getElementById('st-tot').textContent  = s.total;
+  document.getElementById('st-rev').textContent  = s.revenue >= 1000 ? (s.revenue/1000).toFixed(0)+'K' : s.revenue;
+  document.getElementById('st-cli').textContent  = s.clients;
+  const list = Orders.get().slice(0,5);
+  document.getElementById('dash-orders').innerHTML = list.length ? list.map(o=>ordRowHtml(o,true)).join('') :
+    '<div class="empty-state" style="padding:30px 0"><div class="empty-ico">📦</div><div class="empty-title">Sem pedidos ainda</div></div>';
+}
+
+/* ══════════════════════════════════
+   ORDERS
+══════════════════════════════════ */
+let _ordFilter='all', _ordSearch='';
+function loadOrders(){
+  let list=Orders.get();
+  if(_ordFilter!=='all') list=list.filter(o=>o.status===_ordFilter);
+  if(_ordSearch) list=list.filter(o=>o.reference?.toLowerCase().includes(_ordSearch)||o.customer?.name?.toLowerCase().includes(_ordSearch));
+  document.getElementById('ords-list').innerHTML=list.length?list.map(o=>ordRowHtml(o)).join(''):
+    '<div class="empty-state" style="padding:30px 0"><div class="empty-ico">📦</div><div class="empty-title">Nenhum pedido</div></div>';
+}
+function ordRowHtml(o, compact=false){
+  const st=ORDER_STATUS[o.status]||ORDER_STATUS.pending;
+  return `<div class="ord-row" onclick="openOrd('${o.reference}')">
+    <div class="ord-hdr">
+      <div class="ord-ref">${o.reference}</div>
+      <div class="status-pill" style="background:${st.bg};color:${st.color}">${st.icon} ${st.label}</div>
+    </div>
+    <div class="ord-client">${o.customer?.name||'—'} · ${o.customer?.phone||''}</div>
+    <div class="ord-meta"><span>${fmtDate(o.created_at)}</span><span class="ord-total">${kz(o.total)}</span></div>
+  </div>`;
+}
+function filterOrds(f,btn){ _ordFilter=f; document.querySelectorAll('#ord-filter-bar .fb-btn').forEach(b=>b.classList.remove('on')); btn.classList.add('on'); loadOrders(); }
+const searchOrds = debounce(v=>{ _ordSearch=v.toLowerCase(); loadOrders(); });
+
+function openOrd(ref){
+  const o=Orders.get().find(x=>x.reference===ref); if(!o)return;
+  const st=ORDER_STATUS[o.status]||ORDER_STATUS.pending;
+  document.getElementById('ord-detail').innerHTML=`
+    <div style="margin-bottom:14px"><div class="ord-ref">${o.reference}</div><div style="font-size:.72rem;color:var(--muted)">${fmtDate(o.created_at)}</div></div>
+    <div class="card card-p mb-12">
+      <div style="font-size:.65rem;font-weight:700;text-transform:uppercase;letter-spacing:.5px;color:var(--muted);margin-bottom:8px">Cliente</div>
+      <div style="font-size:.9rem;font-weight:700">${o.customer?.name||'—'}</div>
+      <div style="font-size:.78rem;color:var(--muted)">${o.customer?.phone||''}${o.customer?.email?' · '+o.customer.email:''}</div>
+      ${o.customer?.address?`<div style="font-size:.78rem;color:var(--muted);margin-top:4px">📍 ${o.customer.address}</div>`:''}
+    </div>
+    <div style="font-size:.78rem;font-weight:700;margin-bottom:8px">Alterar estado</div>
+    <div style="display:flex;gap:8px;flex-wrap:wrap;margin-bottom:16px">
+      ${Object.entries(ORDER_STATUS).map(([k,v])=>`<button style="padding:8px 12px;border:1px solid ${o.status===k?v.color:' var(--border)'};border-radius:50px;font-size:.72rem;font-weight:700;cursor:pointer;background:${o.status===k?v.bg:'none'};color:${o.status===k?v.color:'var(--muted)'};transition:var(--tr)" onclick="changeOrdStatus('${ref}','${k}',this)">${v.icon} ${v.label}</button>`).join('')}
+    </div>
+    ${o.items?.length?`
+    <div style="font-size:.78rem;font-weight:700;margin-bottom:8px">Itens do pedido</div>
+    ${o.items.map(it=>`<div style="display:flex;justify-content:space-between;padding:8px 0;border-bottom:1px solid var(--border);font-size:.84rem"><span>${it.name} <span style="color:var(--muted)">×${it.qty}</span></span><span style="font-weight:700;color:var(--pink)">${kz(it.price*it.qty)}</span></div>`).join('')}
+    <div style="display:flex;justify-content:space-between;padding:12px 0 0;border-top:2px solid var(--border);margin-top:4px"><span style="font-family:var(--ff);font-weight:700">Total</span><span style="font-family:var(--ff);font-weight:700;color:var(--pink);font-size:1.1rem">${kz(o.total)}</span></div>`:''}
+    ${o.notes?`<div style="margin-top:12px;font-size:.8rem;color:var(--muted);background:var(--bg2);border-radius:10px;padding:10px">📝 ${o.notes}</div>`:''}
+    <div style="margin-top:16px;display:flex;gap:8px">
+      <button class="btn-ghost btn-sm" style="flex:1" onclick="window.open('https://wa.me/${(CMS.store().whatsapp||'').replace(/\\D/g,'')}?text=${encodeURIComponent('Olá! Sobre a encomenda '+ref)}','_blank')"><i class="fa-brands fa-whatsapp"></i> WhatsApp</button>
+    </div>`;
+  openModal('ord-modal');
+}
+function changeOrdStatus(ref,status,btn){
+  Orders.updateStatus(ref,status);
+  document.querySelectorAll('#ord-detail button').forEach(b=>{
+    const k=b.getAttribute('onclick')?.match(/'([a-z]+)'/g)?.[1]?.replace(/'/g,'');
+    if(!k||!ORDER_STATUS[k])return;
+    const st=ORDER_STATUS[k];
+    b.style.border=`1px solid ${k===status?st.color:'var(--border)'}`;
+    b.style.background=k===status?st.bg:'none';
+    b.style.color=k===status?st.color:'var(--muted)';
+  });
+  toast('Estado actualizado','ok'); loadDash(); loadOrders();
+}
+
+/* ══════════════════════════════════
+   PRODUCTS
+══════════════════════════════════ */
+let _prodFilter='all';
+function renderProds(){
+  const search=(document.getElementById('prod-search')?.value||'').toLowerCase();
+  let list=CMS.products();
+  if(_prodFilter==='active')   list=list.filter(p=>p.active!==false);
+  if(_prodFilter==='featured') list=list.filter(p=>p.featured);
+  if(_prodFilter==='lowstock') list=list.filter(p=>p.stock<=3);
+  if(_prodFilter==='inactive') list=list.filter(p=>p.active===false);
+  if(search) list=list.filter(p=>p.name.toLowerCase().includes(search)||(p.desc||'').toLowerCase().includes(search));
+  document.getElementById('prods-list').innerHTML=list.length?list.map(p=>prodRowHtml(p)).join(''):
+    '<div class="empty-state" style="padding:30px 0"><div class="empty-ico">📦</div><div class="empty-title">Nenhum produto</div></div>';
+}
+function filterProds(f,btn){ _prodFilter=f; document.querySelectorAll('#prod-filter-bar .fb-btn').forEach(b=>b.classList.remove('on')); btn.classList.add('on'); renderProds(); }
+
+function prodRowHtml(p){
+  const cat=CMS.allCats().find(c=>c.id===p.cid);
+  const inactive=p.active===false;
+  const tagMap={promo:'Promo',novo:'Novo',destaque:'Destaque',bestseller:'Best Seller'};
+  return `<div class="prod-row ${inactive?'inactive-overlay':''}">
+    <div class="pr-img">${p.image?`<img src="${p.image}" alt="${p.name}" onerror="this.style.display='none'">`:''}<span ${p.image?'style="display:none"':''}>${p.emoji}</span></div>
+    <div class="pr-info">
+      <div class="pr-name">${p.name}</div>
+      <div class="pr-meta">${cat?.name||'Sem categoria'} · Stock: <strong style="color:${p.stock<=3?'var(--red)':'var(--teal)'}">${p.stock}</strong> · ${kz(p.price)}</div>
+      <div class="pr-tags">
+        ${p.featured?'<span class="tag tag-pink">⭐ Destaque</span>':''}
+        ${p.tag?`<span class="tag tag-yellow">${tagMap[p.tag]||p.tag}</span>`:''}
+        ${inactive?'<span class="tag tag-muted">Inactivo</span>':''}
+        ${p.orig>0?`<span class="tag tag-pink">−${Math.round((1-p.price/p.orig)*100)}%</span>`:''}
+      </div>
+    </div>
+    <div class="pr-actions">
+      <div class="pr-price">${kz(p.price)}</div>
+      <button class="btn-icon" onclick="openProdModal(${p.id})" title="Editar"><i class="fa-solid fa-pen"></i></button>
+      <button class="btn-icon" style="color:${p.active===false?'var(--teal)':'var(--muted)'}" onclick="toggleProdActive(${p.id})" title="${p.active===false?'Activar':'Desactivar'}"><i class="fa-solid fa-${p.active===false?'eye':'eye-slash'}"></i></button>
+      <button class="btn-icon" style="color:var(--red)" onclick="deleteProd(${p.id})" title="Eliminar"><i class="fa-solid fa-trash-can"></i></button>
+    </div>
+  </div>`;
+}
+
+function toggleProdActive(id){
+  const p=CMS.getProduct(id); if(!p)return;
+  p.active=p.active===false?true:false;
+  CMS.saveProduct(p); renderProds(); toast(p.active?'Produto activado':'Produto desactivado','ok');
+}
+function deleteProd(id){
+  if(!confirm('Eliminar produto? Esta acção não pode ser desfeita.'))return;
+  CMS.deleteProduct(id); renderProds(); toast('Produto eliminado','err');
+}
+
+function openProdModal(id){
+  const p=id?CMS.getProduct(id):null;
+  document.getElementById('prod-modal-title').textContent=p?'Editar Produto':'Novo Produto';
+  const cats=CMS.allCats();
+  document.getElementById('prod-form-area').innerHTML=`
+    <div class="form-group"><label class="form-label">Nome <span>*</span></label><input class="form-input" id="pf-name" type="text" value="${p?.name||''}" placeholder="Nome do produto"></div>
+    <div class="form-group"><label class="form-label">Categoria</label>
+      <select class="form-input" id="pf-cat">${cats.map(c=>`<option value="${c.id}" ${p?.cid==c.id?'selected':''}>${c.emoji} ${c.name}</option>`).join('')}</select>
+    </div>
+    <div style="display:grid;grid-template-columns:1fr 1fr;gap:10px">
+      <div class="form-group"><label class="form-label">Preço (Kz) <span>*</span></label><input class="form-input" id="pf-price" type="number" min="0" value="${p?.price||''}"></div>
+      <div class="form-group"><label class="form-label">Preço original <small>opcional</small></label><input class="form-input" id="pf-orig" type="number" min="0" value="${p?.orig||''}"></div>
+    </div>
+    <div style="display:grid;grid-template-columns:1fr 1fr;gap:10px">
+      <div class="form-group"><label class="form-label">Stock</label><input class="form-input" id="pf-stock" type="number" min="0" value="${p?.stock??0}"></div>
+      <div class="form-group"><label class="form-label">Emoji</label><input class="form-input" id="pf-emoji" type="text" value="${p?.emoji||'✨'}" maxlength="4"></div>
+    </div>
+    <div class="form-group"><label class="form-label">Etiqueta especial</label>
+      <select class="form-input" id="pf-tag">
+        <option value="">— Nenhuma —</option>
+        <option value="novo" ${p?.tag==='novo'?'selected':''}>Novo</option>
+        <option value="promo" ${p?.tag==='promo'?'selected':''}>Promo (mostra % de desconto)</option>
+        <option value="destaque" ${p?.tag==='destaque'?'selected':''}>Destaque</option>
+        <option value="bestseller" ${p?.tag==='bestseller'?'selected':''}>Best Seller</option>
+      </select>
+    </div>
+    <div class="form-group"><label class="form-label">URL da imagem <small>ou fique em branco para usar o emoji</small></label>
+      <input class="form-input" id="pf-image" type="url" value="${p?.image||''}" placeholder="https://..." oninput="previewImg(this.value)">
+      <img id="img-preview" class="img-preview ${p?.image?'show':''}" src="${p?.image||''}" style="margin-top:8px">
+    </div>
+    <div class="form-group"><label class="form-label">Descrição</label><textarea class="form-input ta-lg" id="pf-desc">${p?.desc||''}</textarea></div>
+    <div class="form-group"><label class="form-label">Destaques / Highlights <small>um por linha</small></label><textarea class="form-input" id="pf-hls" rows="5">${(p?.hl||[]).join('\n')}</textarea></div>
+    <div style="display:flex;align-items:center;justify-content:space-between;padding:12px 0;border-top:1px solid var(--border);border-bottom:1px solid var(--border);margin-bottom:16px">
+      <div><div style="font-size:.86rem;font-weight:700">Produto em destaque</div><div style="font-size:.72rem;color:var(--muted)">Aparece na secção de produtos populares</div></div>
+      <label class="switch"><input type="checkbox" id="pf-featured" ${p?.featured?'checked':''}><span class="switch-slider"></span></label>
+    </div>
+    <div style="display:flex;align-items:center;justify-content:space-between;padding:12px 0;border-bottom:1px solid var(--border);margin-bottom:16px">
+      <div><div style="font-size:.86rem;font-weight:700">Produto activo</div><div style="font-size:.72rem;color:var(--muted)">Aparece no catálogo do site</div></div>
+      <label class="switch"><input type="checkbox" id="pf-active" ${p?.active!==false?'checked':''}><span class="switch-slider"></span></label>
+    </div>
+    ${p?`<button class="btn-danger w-full mb-8" onclick="deleteProd(${p.id});closeModal('prod-modal')"><i class="fa-solid fa-trash-can"></i> Eliminar produto</button>`:''}
+    <button class="btn-primary w-full" onclick="saveProd(${p?.id||0})"><i class="fa-solid fa-floppy-disk"></i> ${p?'Guardar alterações':'Criar produto'}</button>`;
+  openModal('prod-modal');
+}
+function previewImg(url){ const el=document.getElementById('img-preview'); if(url){el.src=url;el.classList.add('show');}else el.classList.remove('show'); }
+function saveProd(id){
+  const name=document.getElementById('pf-name').value.trim();
+  const price=parseFloat(document.getElementById('pf-price').value)||0;
+  if(!name){toast('Introduza o nome do produto','err');return;}
+  if(price<=0){toast('Introduza um preço válido','err');return;}
+  const prod={
+    id:id||0, cid:parseInt(document.getElementById('pf-cat').value),
+    name, price, orig:parseFloat(document.getElementById('pf-orig').value)||0,
+    stock:parseInt(document.getElementById('pf-stock').value)||0,
+    emoji:document.getElementById('pf-emoji').value||'✨',
+    tag:document.getElementById('pf-tag').value,
+    image:document.getElementById('pf-image').value.trim(),
+    desc:document.getElementById('pf-desc').value.trim(),
+    hl:document.getElementById('pf-hls').value.split('\n').map(s=>s.trim()).filter(Boolean),
+    featured:document.getElementById('pf-featured').checked,
+    active:document.getElementById('pf-active').checked,
+  };
+  CMS.saveProduct(prod); closeModal('prod-modal'); renderProds(); toast('✓ Produto guardado','ok');
+}
+
+/* ══════════════════════════════════
+   CATEGORIES
+══════════════════════════════════ */
+function renderCats(){
+  const cats=CMS.allCats();
+  document.getElementById('cats-list').innerHTML=cats.length?cats.map(c=>`
+    <div class="item-row ${c.active===false?'inactive-overlay':''}">
+      <div class="item-row-hdr">
+        <span style="font-size:1.5rem;margin-right:8px">${c.emoji}</span>
+        <div class="item-row-title">${c.name}</div>
+        <div style="width:14px;height:14px;border-radius:50%;background:${c.color||'var(--pink)'}"></div>
+      </div>
+      <div style="display:flex;align-items:center;justify-content:space-between">
+        <div class="item-row-sub">${CMS.products().filter(p=>p.cid===c.id).length} produtos · ${c.active===false?'Inactiva':'Activa'}</div>
+        <div class="item-row-actions">
+          <button class="btn-icon" onclick="openCatModal(${c.id})" title="Editar"><i class="fa-solid fa-pen"></i></button>
+          <button class="btn-icon" style="color:${c.active===false?'var(--teal)':'var(--muted)'}" onclick="toggleCatActive(${c.id})"><i class="fa-solid fa-${c.active===false?'eye':'eye-slash'}"></i></button>
+          <button class="btn-icon" style="color:var(--red)" onclick="deleteCat(${c.id})"><i class="fa-solid fa-trash-can"></i></button>
+        </div>
+      </div>
+    </div>`).join('') : '<div class="empty-state"><div class="empty-ico">🏷️</div><div class="empty-title">Sem categorias</div></div>';
+}
+function openCatModal(id){
+  const c=id?CMS.allCats().find(x=>x.id===id):null;
+  document.getElementById('cat-modal-title').textContent=c?'Editar Categoria':'Nova Categoria';
+  document.getElementById('cat-form-area').innerHTML=`
+    <div class="form-group"><label class="form-label">Nome <span>*</span></label><input class="form-input" id="cf-name" type="text" value="${c?.name||''}"></div>
+    <div style="display:grid;grid-template-columns:1fr 1fr;gap:10px">
+      <div class="form-group"><label class="form-label">Emoji</label><input class="form-input" id="cf-emoji" type="text" value="${c?.emoji||'✨'}" maxlength="4"></div>
+      <div class="form-group"><label class="form-label">Cor (hex)</label><input class="form-input" id="cf-color" type="color" value="${c?.color||'#e8609a'}" style="height:44px;padding:4px 8px"></div>
+    </div>
+    <div class="form-group"><label class="form-label">Slug <small>URL amigável</small></label><input class="form-input" id="cf-slug" type="text" value="${c?.slug||''}" placeholder="cuidado-da-pele"></div>
+    <button class="btn-primary w-full mt-8" onclick="saveCat(${c?.id||0})"><i class="fa-solid fa-floppy-disk"></i> ${c?'Guardar':'Criar'}</button>`;
+  openModal('cat-modal');
+}
+function saveCat(id){
+  const name=document.getElementById('cf-name').value.trim(); if(!name){toast('Introduza o nome','err');return;}
+  CMS.saveCat({ id:id||0, name, emoji:document.getElementById('cf-emoji').value||'✨', color:document.getElementById('cf-color').value, slug:document.getElementById('cf-slug').value||slugify(name), active:true });
+  closeModal('cat-modal'); renderCats(); toast('✓ Categoria guardada','ok');
+}
+function toggleCatActive(id){ const c=CMS.allCats().find(x=>x.id===id); if(!c)return; c.active=c.active===false?true:false; CMS.saveCat(c); renderCats(); toast(c.active?'Categoria activada':'Desactivada','ok'); }
+function deleteCat(id){ if(!confirm('Eliminar categoria?'))return; CMS.deleteCat(id); renderCats(); toast('Eliminada','err'); }
+
+/* ══════════════════════════════════
+   HOMEPAGE EDITOR
+══════════════════════════════════ */
+function loadHomeEditor(){
+  const d=CMS.load();
+  const h=d.home||{};
+  const an=h.announce||{};
+  document.getElementById('hm-ann-active').checked=an.active!==false;
+  document.getElementById('hm-ann-text').value=an.text||'';
+  const hero=h.hero||{};
+  document.getElementById('hm-h-badge').value=hero.badge||'';
+  document.getElementById('hm-h-title').value=hero.title||'';
+  document.getElementById('hm-h-sub').value=hero.sub||'';
+  document.getElementById('hm-h-btn1').value=hero.btn1||'';
+  document.getElementById('hm-h-btn2').value=hero.btn2||'';
+  // Stats
+  renderStatsEditor(h.stats||[]);
+  const cs=h.catsSec||{};
+  document.getElementById('hm-cs-badge').value=cs.badge||'';
+  document.getElementById('hm-cs-title').value=cs.title||'';
+  document.getElementById('hm-cs-sub').value=cs.sub||'';
+  const fs=h.featSec||{};
+  document.getElementById('hm-fs-badge').value=fs.badge||'';
+  document.getElementById('hm-fs-title').value=fs.title||'';
+  const ds=h.depsSec||{};
+  document.getElementById('hm-ds-badge').value=ds.badge||'';
+  document.getElementById('hm-ds-title').value=ds.title||'';
+  const cta=h.ctaSec||{};
+  document.getElementById('hm-cta-emoji').value=cta.emoji||'✨';
+  document.getElementById('hm-cta-title').value=cta.title||'';
+  document.getElementById('hm-cta-sub').value=cta.sub||'';
+  document.getElementById('hm-cta-btn').value=cta.btn||'';
+}
+function renderStatsEditor(stats){
+  document.getElementById('stats-editor').innerHTML=stats.map((st,i)=>`
+    <div style="display:grid;grid-template-columns:1fr 1fr auto;gap:8px;margin-bottom:8px;align-items:end">
+      <div><label class="form-label" style="margin-bottom:4px">Valor</label><input class="form-input" type="text" value="${st.value}" oninput="updateStat(${i},'value',this.value)" placeholder="2.5K+"></div>
+      <div><label class="form-label" style="margin-bottom:4px">Rótulo</label><input class="form-input" type="text" value="${st.label}" oninput="updateStat(${i},'label',this.value)" placeholder="Clientes"></div>
+      <button class="btn-danger" style="padding:10px 12px;border-radius:10px" onclick="removeStat(${i})"><i class="fa-solid fa-trash-can"></i></button>
+    </div>`).join('');
+}
+function updateStat(i,field,val){ const d=CMS.load(); d.home.stats[i][field]=val; CMS.save(); }
+function addStat(){ const d=CMS.load(); if(!d.home.stats)d.home.stats=[]; d.home.stats.push({value:'',label:''}); CMS.save(); renderStatsEditor(d.home.stats); }
+function removeStat(i){ const d=CMS.load(); d.home.stats.splice(i,1); CMS.save(); renderStatsEditor(d.home.stats); }
+function saveHomeSec(){
+  const d=CMS.load();
+  if(!d.home)d.home={};
+  d.home.announce={ active:document.getElementById('hm-ann-active').checked, text:document.getElementById('hm-ann-text').value };
+  d.home.hero={ badge:document.getElementById('hm-h-badge').value, title:document.getElementById('hm-h-title').value, sub:document.getElementById('hm-h-sub').value, btn1:document.getElementById('hm-h-btn1').value, btn2:document.getElementById('hm-h-btn2').value };
+  d.home.catsSec={ badge:document.getElementById('hm-cs-badge').value, title:document.getElementById('hm-cs-title').value, sub:document.getElementById('hm-cs-sub').value };
+  d.home.featSec={ badge:document.getElementById('hm-fs-badge').value, title:document.getElementById('hm-fs-title').value };
+  d.home.depsSec={ badge:document.getElementById('hm-ds-badge').value, title:document.getElementById('hm-ds-title').value };
+  d.home.ctaSec={ emoji:document.getElementById('hm-cta-emoji').value, title:document.getElementById('hm-cta-title').value, sub:document.getElementById('hm-cta-sub').value, btn:document.getElementById('hm-cta-btn').value };
+  CMS.save();
+}
+
+/* ══════════════════════════════════
+   TESTIMONIALS
+══════════════════════════════════ */
+function renderDeps(){
+  const list=CMS.testimonials();
+  document.getElementById('deps-list').innerHTML=list.length?list.map((d,i)=>`
+    <div class="item-row">
+      <div class="item-row-hdr">
+        <span style="font-size:1.2rem;margin-right:6px">${d.av||'😊'}</span>
+        <div><div class="item-row-title">${d.name}</div><div class="item-row-sub">${d.loc} · ${'★'.repeat(d.stars||5)}</div></div>
+      </div>
+      <div style="font-size:.82rem;color:var(--muted);font-style:italic;margin:6px 0;line-height:1.5">"${d.text}"</div>
+      <div class="item-row-actions" style="justify-content:flex-end">
+        <button class="btn-icon" onclick="openDepModal(${JSON.stringify(d).replace(/"/g,"'")},${i})"><i class="fa-solid fa-pen"></i></button>
+        <button class="btn-icon" style="color:var(--red)" onclick="deleteDep(${i})"><i class="fa-solid fa-trash-can"></i></button>
+      </div>
+    </div>`).join('') : '<div class="empty-state" style="padding:30px 0"><div class="empty-ico">⭐</div><div class="empty-title">Sem depoimentos</div></div>';
+}
+function openDepModal(d,idx){
+  document.getElementById('dep-form-area').innerHTML=`
+    <div class="form-group"><label class="form-label">Nome da cliente</label><input class="form-input" id="df-name" type="text" value="${d?.name||''}"></div>
+    <div class="form-group"><label class="form-label">Localização / Tipo de produto</label><input class="form-input" id="df-loc" type="text" value="${d?.loc||''}" placeholder="Luanda · Skincare"></div>
+    <div class="form-group"><label class="form-label">Emoji avatar</label><input class="form-input" id="df-av" type="text" value="${d?.av||'😊'}" maxlength="4"></div>
+    <div class="form-group"><label class="form-label">Avaliação (estrelas)</label>
+      <select class="form-input" id="df-stars"><option value="5" ${d?.stars==5?'selected':''}>★★★★★ (5)</option><option value="4" ${d?.stars==4?'selected':''}>★★★★☆ (4)</option><option value="3" ${d?.stars==3?'selected':''}>★★★☆☆ (3)</option></select>
+    </div>
+    <div class="form-group"><label class="form-label">Texto do depoimento</label><textarea class="form-input ta-lg" id="df-text">${d?.text||''}</textarea></div>
+    <button class="btn-primary w-full" onclick="saveDep(${idx})"><i class="fa-solid fa-floppy-disk"></i> Guardar</button>`;
+  openModal('dep-modal');
+}
+function saveDep(idx){
+  const t={name:document.getElementById('df-name').value.trim(),loc:document.getElementById('df-loc').value.trim(),av:document.getElementById('df-av').value||'😊',stars:parseInt(document.getElementById('df-stars').value),text:document.getElementById('df-text').value.trim()};
+  if(!t.text){toast('Introduza o texto do depoimento','err');return;}
+  const list=CMS.testimonials(); if(idx>=0&&idx<list.length)list[idx]=t; else list.push(t);
+  CMS.set('testimonials',list); closeModal('dep-modal'); renderDeps(); toast('✓ Depoimento guardado','ok');
+}
+function deleteDep(i){ if(!confirm('Eliminar?'))return; const l=CMS.testimonials(); l.splice(i,1); CMS.set('testimonials',l); renderDeps(); toast('Eliminado','err'); }
+
+/* ══════════════════════════════════
+   FEATURES
+══════════════════════════════════ */
+function renderFeats(){
+  const list=CMS.features();
+  document.getElementById('feats-list').innerHTML=list.length?list.map((f,i)=>`
+    <div class="item-row">
+      <div class="item-row-hdr">
+        <span style="font-size:1.4rem;margin-right:8px">${f.emoji}</span>
+        <div class="item-row-title">${f.title}</div>
+      </div>
+      <div style="font-size:.8rem;color:var(--muted);margin:4px 0">${f.desc}</div>
+      <div class="item-row-actions" style="justify-content:flex-end">
+        <button class="btn-icon" onclick="openFeatModal(${JSON.stringify(f).replace(/"/g,"'")},${i})"><i class="fa-solid fa-pen"></i></button>
+        <button class="btn-icon" style="color:var(--red)" onclick="deleteFeat(${i})"><i class="fa-solid fa-trash-can"></i></button>
+      </div>
+    </div>`).join('') : '<div class="empty-state" style="padding:30px 0"><div class="empty-ico">✅</div><div class="empty-title">Sem destaques</div></div>';
+}
+function openFeatModal(f,idx){
+  document.getElementById('feat-form-area').innerHTML=`
+    <div class="form-group"><label class="form-label">Emoji</label><input class="form-input" id="ff-emoji" type="text" value="${f?.emoji||'✨'}" maxlength="4"></div>
+    <div class="form-group"><label class="form-label">Título</label><input class="form-input" id="ff-title" type="text" value="${f?.title||''}"></div>
+    <div class="form-group"><label class="form-label">Descrição</label><textarea class="form-input" id="ff-desc">${f?.desc||''}</textarea></div>
+    <button class="btn-primary w-full" onclick="saveFeat(${idx})"><i class="fa-solid fa-floppy-disk"></i> Guardar</button>`;
+  openModal('feat-modal');
+}
+function saveFeat(idx){
+  const f={emoji:document.getElementById('ff-emoji').value||'✨',title:document.getElementById('ff-title').value.trim(),desc:document.getElementById('ff-desc').value.trim()};
+  if(!f.title){toast('Introduza o título','err');return;}
+  const list=CMS.features(); if(idx>=0&&idx<list.length)list[idx]=f; else list.push(f);
+  CMS.set('features',list); closeModal('feat-modal'); renderFeats(); toast('✓ Guardado','ok');
+}
+function deleteFeat(i){ if(!confirm('Eliminar?'))return; const l=CMS.features(); l.splice(i,1); CMS.set('features',l); renderFeats(); toast('Eliminado','err'); }
+
+/* ══════════════════════════════════
+   SOBRE
+══════════════════════════════════ */
+function loadSobreEditor(){
+  const s=CMS.sobre();
+  document.getElementById('sb-hero-title').value=s?.hero?.title||'';
+  document.getElementById('sb-hero-sub').value=s?.hero?.sub||'';
+  document.getElementById('sb-mission').value=s?.mission||'';
+  document.getElementById('sb-story').value=s?.story||'';
+  renderSbStats(s?.stats||[]);
+  renderFaqEditor(s?.faq||[]);
+}
+function renderSbStats(stats){
+  document.getElementById('sb-stats-editor').innerHTML=stats.map((st,i)=>`
+    <div style="display:grid;grid-template-columns:1fr 1fr auto;gap:8px;margin-bottom:8px;align-items:end">
+      <div><label class="form-label" style="margin-bottom:4px">Valor</label><input class="form-input" type="text" value="${st.value}" oninput="updateSbStat(${i},'value',this.value)"></div>
+      <div><label class="form-label" style="margin-bottom:4px">Rótulo</label><input class="form-input" type="text" value="${st.label}" oninput="updateSbStat(${i},'label',this.value)"></div>
+      <button class="btn-danger" style="padding:10px 12px;border-radius:10px" onclick="removeSbStat(${i})"><i class="fa-solid fa-trash-can"></i></button>
+    </div>`).join('')+`<button class="btn-ghost btn-sm" onclick="addSbStat()"><i class="fa-solid fa-plus"></i> Adicionar</button>`;
+}
+function updateSbStat(i,f,v){ const d=CMS.load(); d.sobre.stats[i][f]=v; CMS.save(); }
+function addSbStat(){ const d=CMS.load(); if(!d.sobre.stats)d.sobre.stats=[]; d.sobre.stats.push({value:'',label:''}); CMS.save(); renderSbStats(d.sobre.stats); }
+function removeSbStat(i){ const d=CMS.load(); d.sobre.stats.splice(i,1); CMS.save(); renderSbStats(d.sobre.stats); }
+function renderFaqEditor(faqs){
+  document.getElementById('faq-editor').innerHTML=faqs.map((f,i)=>`
+    <div style="background:var(--bg2);border:1px solid var(--border);border-radius:12px;padding:12px;margin-bottom:8px">
+      <div class="form-group"><label class="form-label" style="margin-bottom:4px">Pergunta</label><input class="form-input" type="text" value="${f.q}" oninput="updateFaq(${i},'q',this.value)"></div>
+      <div class="form-group" style="margin-bottom:0"><label class="form-label" style="margin-bottom:4px">Resposta</label><textarea class="form-input" oninput="updateFaq(${i},'a',this.value)" rows="2">${f.a}</textarea></div>
+      <button class="btn-danger btn-sm mt-8" onclick="removeFaq(${i})"><i class="fa-solid fa-trash-can"></i> Eliminar</button>
+    </div>`).join('');
+}
+function updateFaq(i,f,v){ const d=CMS.load(); d.sobre.faq[i][f]=v; CMS.save(); }
+function addFaq(){ const d=CMS.load(); if(!d.sobre.faq)d.sobre.faq=[]; d.sobre.faq.push({q:'',a:''}); CMS.save(); renderFaqEditor(d.sobre.faq); }
+function removeFaq(i){ const d=CMS.load(); d.sobre.faq.splice(i,1); CMS.save(); renderFaqEditor(d.sobre.faq); }
+function saveSobre(){
+  const d=CMS.load();
+  if(!d.sobre)d.sobre={};
+  d.sobre.hero={ title:document.getElementById('sb-hero-title').value, sub:document.getElementById('sb-hero-sub').value };
+  d.sobre.mission=document.getElementById('sb-mission').value;
+  d.sobre.story=document.getElementById('sb-story').value;
+  CMS.save(); toast('✓ Página "Sobre" guardada','ok');
+}
+
+/* ══════════════════════════════════
+   LOJA
+══════════════════════════════════ */
+function loadLojaEditor(){
+  const s=CMS.store();
+  document.getElementById('lj-nome').value=s.name||'';
+  document.getElementById('lj-slogan').value=s.tagline||'';
+  document.getElementById('lj-email').value=s.email||'';
+  document.getElementById('lj-tel').value=s.phone||'';
+  document.getElementById('lj-wa').value=s.whatsapp||'';
+  document.getElementById('lj-morada').value=s.address||'';
+  document.getElementById('lj-moeda').value=s.currency||'Kz';
+  document.getElementById('lj-delivery').value=s.deliveryFee||0;
+  document.getElementById('lj-free').value=s.freeAbove||0;
+  document.getElementById('lj-ig').value=s.instagram||'';
+  document.getElementById('lj-fb').value=s.facebook||'';
+  document.getElementById('lj-tt').value=s.tiktok||'';
+}
+function saveLoja(){
+  CMS.set('store',{
+    name:document.getElementById('lj-nome').value.trim(),
+    tagline:document.getElementById('lj-slogan').value.trim(),
+    email:document.getElementById('lj-email').value.trim(),
+    phone:document.getElementById('lj-tel').value.trim(),
+    whatsapp:document.getElementById('lj-wa').value.trim(),
+    address:document.getElementById('lj-morada').value.trim(),
+    currency:document.getElementById('lj-moeda').value.trim()||'Kz',
+    deliveryFee:parseFloat(document.getElementById('lj-delivery').value)||0,
+    freeAbove:parseFloat(document.getElementById('lj-free').value)||0,
+    instagram:document.getElementById('lj-ig').value.trim(),
+    facebook:document.getElementById('lj-fb').value.trim(),
+    tiktok:document.getElementById('lj-tt').value.trim(),
+  });
+  toast('✓ Definições da loja guardadas','ok');
+}
+
+/* ══════════════════════════════════
+   CONFIG
+══════════════════════════════════ */
+function loadConfigEditor(){
+  const s=Settings.get();
+  ['cf-api','cf-token','gh-repo','gh-branch','gh-token','gh-imgpath','wa-phone','wa-key','ej-svc','ej-tpl','ej-key'].forEach(id=>{
+    const el=document.getElementById(id); if(el) el.value=s[id.replace('-','_')]||'';
+  });
+}
+function saveConfig(){
+  const data={};
+  ['cf-api','cf-token','gh-repo','gh-branch','gh-token','gh-imgpath','wa-phone','wa-key','ej-svc','ej-tpl','ej-key'].forEach(id=>{
+    data[id.replace('-','_')]=document.getElementById(id)?.value.trim()||'';
+  });
+  Settings.set(data);
+  const apiBase=document.getElementById('cf-api').value.trim();
+  if(apiBase) localStorage.setItem('bl_api_base',apiBase);
+  toast('✓ Configurações guardadas','ok');
+}
+
+/* ══════════════════════════════════
+   PIN
+══════════════════════════════════ */
+function doChangePin(){
+  const old=document.getElementById('pin-old').value;
+  const novo=document.getElementById('pin-new').value;
+  const conf=document.getElementById('pin-conf').value;
+  if(!Settings.verifyPin(old)){toast('PIN actual incorrecto','err');return;}
+  if(!/^\d{4}$/.test(novo)){toast('Novo PIN deve ter exactamente 4 dígitos','err');return;}
+  if(novo!==conf){toast('Os PINs não coincidem','err');return;}
+  Settings.setPin(novo);
+  toast('✓ PIN alterado com sucesso','ok');
+  ['pin-old','pin-new','pin-conf'].forEach(id=>document.getElementById(id).value='');
+}
+
+/* ══════════════════════════════════
+   MODALS
+══════════════════════════════════ */
+function openModal(id)  { document.getElementById(id).classList.add('on'); }
+function closeModal(id) { document.getElementById(id).classList.remove('on'); }
+
+document.addEventListener('DOMContentLoaded', () => { Theme.init(); });
+</script>
+</body>
+</html>

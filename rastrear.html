@@ -1,0 +1,140 @@
+<!DOCTYPE html>
+<html lang="pt-AO" data-theme="dark">
+<head>
+<meta charset="UTF-8"><meta name="viewport" content="width=device-width,initial-scale=1.0">
+<title>Rastrear Encomenda | Belle Cosméticos</title>
+<link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>✨</text></svg>">
+<script>(function(){document.documentElement.setAttribute('data-theme',localStorage.getItem('bl_theme')||'dark')})()</script>
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
+<link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,400;0,600;0,700;1,400;1,600&family=Plus+Jakarta+Sans:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="belle.css">
+<style>
+body{padding-top:56px;padding-bottom:40px;min-height:100vh}
+.p-header{position:fixed;top:0;left:0;right:0;z-index:100;height:56px;display:flex;align-items:center;justify-content:space-between;padding:0 14px;background:var(--glass);backdrop-filter:blur(20px);border-bottom:1px solid var(--border)}
+.track-hero{padding:32px 20px 24px;text-align:center;background:linear-gradient(135deg,rgba(200,164,88,.04),rgba(9,8,10,0));border-bottom:1px solid var(--border)}
+.track-ico{font-size:2.5rem;margin-bottom:12px}
+.track-form{padding:20px 16px}
+.input-group{display:flex;gap:8px}
+.input-group .form-input{flex:1}
+.btn-track{padding:12px 18px;background:var(--grad);border:none;border-radius:12px;font-weight:700;color:#09080a;cursor:pointer;font-size:.88rem;transition:var(--tr);white-space:nowrap}
+.btn-track:hover{filter:brightness(1.1)}
+.result-area{padding:0 16px}
+/* Track status */
+.order-card{background:var(--card);border:1px solid var(--border);border-radius:var(--r);padding:16px;margin-bottom:14px}
+.oc-ref{font-family:var(--ff);font-size:1.1rem;font-weight:700;color:var(--gold);margin-bottom:4px}
+.oc-date{font-size:.72rem;color:var(--muted);margin-bottom:12px}
+.oc-status{display:flex;align-items:center;gap:8px;font-size:.82rem;font-weight:600;margin-bottom:12px}
+.oc-dot{width:8px;height:8px;border-radius:50%;flex-shrink:0}
+.oc-total{font-family:var(--ff);font-size:1rem;font-weight:700;color:var(--text)}
+.progress-track{position:relative;padding-left:20px}
+.pt-step{display:flex;gap:12px;position:relative;padding-bottom:18px}
+.pt-step:last-child{padding-bottom:0}
+.pt-step::before{content:'';position:absolute;left:-13px;top:22px;bottom:0;width:2px;background:var(--border)}
+.pt-step:last-child::before{display:none}
+.pt-step.done::before{background:var(--sage)}
+.pt-dot{width:16px;height:16px;border-radius:50%;border:2px solid var(--border);background:var(--bg);position:absolute;left:-21px;top:2px;z-index:1}
+.pt-step.done .pt-dot{background:var(--sage);border-color:var(--sage)}
+.pt-step.active .pt-dot{background:var(--gold);border-color:var(--gold);box-shadow:0 0 0 4px rgba(200,164,88,.15)}
+.pt-label{font-size:.82rem;font-weight:600;margin-bottom:1px}
+.pt-sub{font-size:.7rem;color:var(--muted)}
+</style>
+</head>
+<body>
+<header class="p-header">
+  <button class="nav-btn" onclick="history.back()"><i class="fa-solid fa-arrow-left"></i></button>
+  <span style="font-family:var(--ff);font-size:1.05rem;font-weight:700">Rastrear Encomenda</span>
+  <div style="width:36px"></div>
+</header>
+
+<div class="track-hero">
+  <div class="track-ico">📦</div>
+  <h1 style="font-family:var(--ff);font-size:1.5rem;font-weight:700;margin-bottom:6px">Onde está a<br><em style="color:var(--gold)">minha encomenda?</em></h1>
+  <p style="font-size:.84rem;color:var(--muted);line-height:1.65">Insira a referência da sua encomenda para consultar o estado.</p>
+</div>
+
+<div class="track-form">
+  <label class="form-label" style="margin-bottom:8px">Referência da encomenda</label>
+  <div class="input-group">
+    <input class="form-input" id="ref-inp" type="text" placeholder="Ex: BL-20240421-1234" oninput="this.value=this.value.toUpperCase()">
+    <button class="btn-track" onclick="track()"><i class="fa-solid fa-magnifying-glass"></i> Buscar</button>
+  </div>
+</div>
+
+<div class="result-area" id="result-area"></div>
+
+<div id="bl-toast"></div>
+<script src="belle.js"></script>
+<script>
+const STATUS_STEPS = {
+  pending:   0,
+  confirmed: 1,
+  shipped:   2,
+  delivered: 3,
+  cancelled: -1,
+};
+const STEPS = [
+  { label:'Recebida',    sub:'Encomenda registada no sistema', icon:'fa-check' },
+  { label:'Confirmada',  sub:'Pagamento verificado, a preparar', icon:'fa-circle-check' },
+  { label:'Em entrega',  sub:'Produto em trânsito para si', icon:'fa-truck' },
+  { label:'Entregue',    sub:'Encomenda concluída com sucesso', icon:'fa-box' },
+];
+
+document.addEventListener('DOMContentLoaded', () => {
+  Theme.init();
+  const ref = new URLSearchParams(location.search).get('ref');
+  if (ref) { document.getElementById('ref-inp').value = ref; track(); }
+});
+
+async function track() {
+  const ref = document.getElementById('ref-inp').value.trim();
+  if (!ref) { toast('Insira a referência da encomenda', 'err'); return; }
+  const area = document.getElementById('result-area');
+  area.innerHTML = '<div style="padding:24px;text-align:center"><div class="spinner" style="margin:0 auto"></div></div>';
+  const order = await API.trackOrder(ref);
+  if (!order) {
+    area.innerHTML = `<div class="empty-state"><div class="empty-ico">🔍</div><div class="empty-title">Não encontrada</div><div class="empty-sub">Verifique a referência e tente novamente. A referência tem o formato BL-YYYYMMDD-XXXX.</div></div>`;
+    return;
+  }
+  renderOrder(order, area);
+}
+
+function renderOrder(o, el) {
+  const st = ORDER_STATUS[o.status] || ORDER_STATUS.pending;
+  const pi = STATUS_STEPS[o.status] ?? 0;
+  const payMap = { transferencia:'Transferência Bancária', referencia:'Referência Multicaixa', na_entrega:'Pagamento na Entrega' };
+  el.innerHTML = `
+    <div class="order-card">
+      <div class="oc-ref">${o.reference}</div>
+      <div class="oc-date">${fmtDate(o.created_at)}</div>
+      <div class="oc-status">
+        <div class="oc-dot" style="background:${st.color}"></div>
+        <span style="color:${st.color}">${st.icon} ${st.label}</span>
+      </div>
+      ${o.status !== 'cancelled' ? `
+      <div class="progress-track mb-16">
+        ${STEPS.map((s,i) => `
+          <div class="pt-step ${i < pi ? 'done' : ''} ${i === pi ? 'active' : ''}">
+            <div class="pt-dot"></div>
+            <div>
+              <div class="pt-label" style="${i===pi?'color:var(--gold)':i<pi?'color:var(--sage)':''}">${s.label}</div>
+              <div class="pt-sub">${s.sub}</div>
+            </div>
+          </div>`).join('')}
+      </div>` : `<div style="background:rgba(217,80,96,.08);border:1px solid rgba(217,80,96,.2);border-radius:10px;padding:12px;font-size:.82rem;color:var(--red);text-align:center;margin-bottom:14px">❌ Esta encomenda foi cancelada</div>`}
+
+      <div style="display:flex;justify-content:space-between;font-size:.8rem;padding:8px 0;border-top:1px solid var(--border)">
+        <span style="color:var(--muted)">Pagamento</span>
+        <span style="font-weight:600">${payMap[o.payment_method]||o.payment_method}</span>
+      </div>
+      <div style="display:flex;justify-content:space-between;align-items:center;padding:8px 0;border-top:1px solid var(--border)">
+        <span style="font-family:var(--ff);font-weight:700">Total</span>
+        <span style="font-family:var(--ff);font-weight:700;color:var(--gold);font-size:1.1rem">${kz(o.total)}</span>
+      </div>
+    </div>
+    <button class="btn-ghost w-full" onclick="window.open('https://wa.me/${STORE.whatsapp}?text=${encodeURIComponent('Olá! Tenho dúvidas sobre a minha encomenda ' + o.reference)}','_blank')">
+      <i class="fa-brands fa-whatsapp"></i> Falar com suporte
+    </button>`;
+}
+</script>
+</body>
+</html>

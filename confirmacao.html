@@ -1,0 +1,118 @@
+<!DOCTYPE html>
+<html lang="pt-AO" data-theme="dark">
+<head>
+<meta charset="UTF-8"><meta name="viewport" content="width=device-width,initial-scale=1.0">
+<title>Confirmação | Belle Cosméticos</title>
+<link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>✨</text></svg>">
+<script>(function(){document.documentElement.setAttribute('data-theme',localStorage.getItem('bl_theme')||'dark')})()</script>
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
+<link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,400;0,600;0,700;1,400;1,600&family=Plus+Jakarta+Sans:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="belle.css">
+<style>
+body{min-height:100vh;display:flex;flex-direction:column;align-items:center;justify-content:flex-start;padding:0;background:var(--bg)}
+.conf-page{width:100%;max-width:480px;padding:56px 20px 60px;text-align:center}
+.conf-anim{width:80px;height:80px;border-radius:50%;background:linear-gradient(135deg,rgba(122,158,130,.2),rgba(122,158,130,.08));border:2px solid var(--sage);display:flex;align-items:center;justify-content:center;font-size:2.5rem;margin:0 auto 20px;animation:pop .6s cubic-bezier(.34,1.56,.64,1) both}
+@keyframes pop{from{transform:scale(0);opacity:0}to{transform:scale(1);opacity:1}}
+.conf-title{font-family:var(--ff);font-size:1.8rem;font-weight:700;margin-bottom:8px;animation:fade-up .6s .2s both}
+.conf-sub{font-size:.88rem;color:var(--muted);line-height:1.75;margin-bottom:28px;animation:fade-up .6s .3s both}
+.ref-box{background:var(--card);border:1px solid var(--border);border-radius:var(--r);padding:16px;margin-bottom:20px;animation:fade-up .6s .4s both}
+.ref-lbl{font-size:.68rem;font-weight:600;color:var(--muted);text-transform:uppercase;letter-spacing:.5px;margin-bottom:6px}
+.ref-val{font-family:var(--ff);font-size:1.4rem;font-weight:700;color:var(--gold);letter-spacing:1px;cursor:pointer}
+.ref-copy{font-size:.68rem;color:var(--muted);margin-top:4px;cursor:pointer}
+.ref-copy:hover{color:var(--gold)}
+.steps-track{text-align:left;margin-bottom:24px;animation:fade-up .6s .5s both}
+.steps-track-title{font-family:var(--ff);font-size:.95rem;font-weight:700;margin-bottom:14px;text-align:center}
+.track-step{display:flex;gap:12px;position:relative;padding-bottom:16px}
+.track-step:last-child{padding-bottom:0}
+.track-step::before{content:'';position:absolute;left:15px;top:28px;bottom:0;width:2px;background:var(--border)}
+.track-step:last-child::before{display:none}
+.ts-ico{width:30px;height:30px;border-radius:50%;background:var(--card);border:2px solid var(--border);display:flex;align-items:center;justify-content:center;font-size:.7rem;flex-shrink:0;position:relative;z-index:1}
+.ts-ico.done{background:var(--sage);border-color:var(--sage);color:#fff}
+.ts-ico.active{background:rgba(200,164,88,.15);border-color:var(--gold);color:var(--gold)}
+.ts-info-title{font-size:.84rem;font-weight:600;margin-bottom:2px}
+.ts-info-sub{font-size:.72rem;color:var(--muted)}
+.conf-btns{display:flex;flex-direction:column;gap:10px;animation:fade-up .6s .6s both}
+.whatsapp-btn{display:flex;align-items:center;justify-content:center;gap:8px;width:100%;height:48px;background:linear-gradient(135deg,#25d366,#128c7e);border-radius:50px;font-size:.9rem;font-weight:700;color:#fff;cursor:pointer;border:none;transition:var(--tr);box-shadow:0 6px 20px rgba(37,211,102,.25)}
+.whatsapp-btn:hover{transform:translateY(-1px);box-shadow:0 10px 28px rgba(37,211,102,.35)}
+</style>
+</head>
+<body>
+<div class="conf-page" id="conf-page">
+  <div style="text-align:center;padding:60px 0"><div class="spinner" style="margin:0 auto"></div></div>
+</div>
+<div id="bl-toast"></div>
+<script src="belle.js"></script>
+<script>
+document.addEventListener('DOMContentLoaded', async () => {
+  Theme.init();
+  const ref = new URLSearchParams(location.search).get('ref');
+  if (!ref) { location.href = 'index.html'; return; }
+  const order = await API.trackOrder(ref);
+  renderConf(order, ref);
+});
+
+function renderConf(order, ref) {
+  const payLabels = { transferencia:'Transferência Bancária', referencia:'Referência Multicaixa', na_entrega:'Pagamento na Entrega' };
+  document.getElementById('conf-page').innerHTML = `
+    <div class="conf-anim">✅</div>
+    <h1 class="conf-title">Encomenda<br><em style="color:var(--gold)">recebida!</em></h1>
+    <p class="conf-sub">A sua encomenda foi registada com sucesso. Entraremos em contacto em breve para confirmar a entrega.</p>
+
+    <div class="ref-box">
+      <div class="ref-lbl">Referência da encomenda</div>
+      <div class="ref-val" onclick="copyRef('${ref}')">${ref}</div>
+      <div class="ref-copy" onclick="copyRef('${ref}')"><i class="fa-regular fa-copy"></i> Copiar referência</div>
+    </div>
+
+    <div class="steps-track">
+      <div class="steps-track-title">Estado da encomenda</div>
+      <div class="track-step">
+        <div class="ts-ico done"><i class="fa-solid fa-check"></i></div>
+        <div><div class="ts-info-title">Encomenda recebida</div><div class="ts-info-sub">Já recebemos a sua encomenda</div></div>
+      </div>
+      <div class="track-step">
+        <div class="ts-ico active"><i class="fa-solid fa-clock"></i></div>
+        <div><div class="ts-info-title">A confirmar</div><div class="ts-info-sub">Em breve entraremos em contacto</div></div>
+      </div>
+      <div class="track-step">
+        <div class="ts-ico"><i class="fa-solid fa-truck"></i></div>
+        <div><div class="ts-info-title">Em entrega</div><div class="ts-info-sub">O produto está a caminho</div></div>
+      </div>
+      <div class="track-step">
+        <div class="ts-ico"><i class="fa-solid fa-box"></i></div>
+        <div><div class="ts-info-title">Entregue</div><div class="ts-info-sub">Encomenda concluída</div></div>
+      </div>
+    </div>
+
+    ${order ? `<div class="card card-p mb-16" style="text-align:left">
+      <div style="font-size:.72rem;color:var(--muted);margin-bottom:10px;font-weight:600;text-transform:uppercase;letter-spacing:.5px">Detalhes</div>
+      <div style="display:flex;justify-content:space-between;font-size:.82rem;padding:5px 0;border-bottom:1px solid var(--border)"><span style="color:var(--muted)">Cliente</span><span style="font-weight:600">${order.customer?.name||'—'}</span></div>
+      <div style="display:flex;justify-content:space-between;font-size:.82rem;padding:5px 0;border-bottom:1px solid var(--border)"><span style="color:var(--muted)">Pagamento</span><span style="font-weight:600">${payLabels[order.payment_method]||order.payment_method}</span></div>
+      <div style="display:flex;justify-content:space-between;font-size:.82rem;padding:5px 0"><span style="color:var(--muted)">Total</span><span style="font-weight:700;color:var(--gold);font-family:var(--ff)">${kz(order.total)}</span></div>
+    </div>` : ''}
+
+    <div class="conf-btns">
+      <button class="whatsapp-btn" onclick="openWhatsApp('${ref}')">
+        <i class="fa-brands fa-whatsapp"></i> Confirmar pelo WhatsApp
+      </button>
+      <button class="btn-ghost w-full" onclick="location.href='rastrear.html?ref=${ref}'">
+        <i class="fa-solid fa-magnifying-glass"></i> Rastrear encomenda
+      </button>
+      <button class="btn-ghost w-full" onclick="location.href='index.html'">
+        Voltar à loja
+      </button>
+    </div>`;
+}
+
+function copyRef(ref) {
+  navigator.clipboard?.writeText(ref).then(() => toast('Referência copiada!', 'info'));
+}
+
+function openWhatsApp(ref) {
+  const sess = Session.get() || {};
+  const msg = `✨ *Olá Belle Cosméticos!*\n\nAcabei de fazer uma encomenda.\n\n*Referência:* ${ref}\n*Nome:* ${sess.name||'—'}\n*Telefone:* ${sess.phone||'—'}\n\nAguardo confirmação. Obrigada! 🌸`;
+  window.open(`https://wa.me/${STORE.whatsapp}?text=${encodeURIComponent(msg)}`, '_blank');
+}
+</script>
+</body>
+</html>

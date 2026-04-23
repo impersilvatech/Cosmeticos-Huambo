@@ -1,0 +1,136 @@
+<!DOCTYPE html>
+<html lang="pt-AO" data-theme="dark">
+<head>
+<meta charset="UTF-8"><meta name="viewport" content="width=device-width,initial-scale=1.0">
+<title>Sobre Nós | Belle Cosméticos</title>
+<link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>✨</text></svg>">
+<script>(function(){document.documentElement.setAttribute('data-theme',localStorage.getItem('bl_theme')||'dark')})()</script>
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
+<link href="https://fonts.googleapis.com/css2?family=Fredoka+One&family=Nunito:wght@400;600;700;800;900&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="belle.css">
+<style>
+body{padding-top:54px;padding-bottom:40px;min-height:100vh}
+.p-hdr{position:fixed;top:0;left:0;right:0;z-index:100;height:54px;display:flex;align-items:center;justify-content:space-between;padding:0 14px;background:var(--glass);backdrop-filter:blur(20px);border-bottom:1px solid var(--border)}
+.about-hero{padding:40px 20px 32px;text-align:center;position:relative;overflow:hidden;background:linear-gradient(180deg,rgba(232,96,154,.06) 0%,transparent 100%)}
+.about-hero::before{content:'Belle';position:absolute;top:50%;left:50%;transform:translate(-50%,-50%);font-family:var(--ff);font-size:7rem;color:rgba(232,96,154,.04);white-space:nowrap;pointer-events:none}
+.about-ico{font-size:3.5rem;margin-bottom:14px}
+.val-grid{display:grid;grid-template-columns:repeat(2,1fr);gap:10px;padding:0 16px}
+.val-card{background:var(--card);border:1px solid var(--border);border-radius:var(--r);padding:18px 14px;text-align:center}
+.val-ico{font-size:1.6rem;margin-bottom:8px}
+.val-title{font-family:var(--ff);font-size:.95rem;margin-bottom:4px}
+.val-desc{font-size:.72rem;color:var(--muted);line-height:1.65}
+.story-block{padding:24px 16px}
+.tl{display:flex;flex-direction:column;position:relative}
+.tl::before{content:'';position:absolute;left:19px;top:0;bottom:0;width:2px;background:var(--border)}
+.tl-item{display:flex;gap:16px;padding-bottom:22px;position:relative;z-index:1}
+.tl-dot{width:38px;height:38px;border-radius:50%;background:rgba(232,96,154,.1);border:2px solid rgba(232,96,154,.4);display:flex;align-items:center;justify-content:center;font-size:.9rem;flex-shrink:0}
+.tl-year{font-family:var(--ff);font-size:.78rem;color:var(--pink);margin-bottom:2px}
+.tl-text{font-size:.82rem;color:var(--muted);line-height:1.65}
+.mission-block{margin:0 16px;background:var(--card);border:1px solid var(--border);border-radius:var(--r);padding:24px;text-align:center;position:relative;overflow:hidden}
+.mission-block::before{content:'"';position:absolute;top:-20px;left:10px;font-family:var(--ff);font-size:8rem;color:rgba(232,96,154,.06);line-height:1}
+.mission-text{font-family:var(--ff);font-size:1.05rem;line-height:1.65;color:var(--text);margin-bottom:10px;font-style:italic}
+.mission-author{font-size:.75rem;color:var(--muted)}
+.contact-grid{display:flex;flex-direction:column;gap:10px;padding:0 16px}
+.contact-item{display:flex;align-items:center;gap:14px;background:var(--card);border:1px solid var(--border);border-radius:14px;padding:14px;cursor:pointer;transition:var(--tr)}
+.contact-item:hover{border-color:rgba(232,96,154,.35)}
+.ci-ico{width:38px;height:38px;border-radius:12px;background:rgba(232,96,154,.1);color:var(--pink);display:flex;align-items:center;justify-content:center;font-size:.95rem;flex-shrink:0}
+.ci-label{font-size:.72rem;color:var(--muted);margin-bottom:1px}
+.ci-val{font-size:.86rem;font-weight:700}
+.stats{display:grid;grid-template-columns:repeat(3,1fr);background:var(--border)}
+.stat{background:var(--card);padding:20px 10px;text-align:center}
+.stat-n{font-family:var(--ff);font-size:1.7rem;background:var(--grad);-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text;line-height:1}
+.stat-l{font-size:.6rem;font-weight:700;text-transform:uppercase;letter-spacing:.5px;color:var(--muted);margin-top:4px}
+</style>
+</head>
+<body>
+<header class="p-hdr">
+  <button class="nav-btn" onclick="history.back()"><i class="fa-solid fa-arrow-left"></i></button>
+  <span style="font-family:var(--ff);font-size:1.1rem">Sobre Nós</span>
+  <a href="carrinho.html" class="nav-btn"><i class="fa-solid fa-bag-shopping"></i><span class="bl-cart-badge">0</span></a>
+</header>
+
+<div id="page"></div>
+<footer class="footer" id="footer"></footer>
+<div id="bl-toast"></div>
+<script src="belle.js"></script>
+<script>
+document.addEventListener('DOMContentLoaded',()=>{
+  Theme.init();
+  render();
+  window.addEventListener('bl:cms', render);
+});
+function render(){
+  const sb=CMS.sobre(); const s=CMS.store();
+  const hero=sb?.hero||{}; const stats=sb?.stats||[];
+  const lines=(hero.title||'Beleza que\ninspira.').split('\n');
+  document.getElementById('page').innerHTML=`
+    <section class="about-hero">
+      <div class="about-ico">✨</div>
+      <div class="sec-badge" style="display:inline-block;margin-bottom:10px">A nossa história</div>
+      <h1 class="sec-title">${lines.map((l,i)=>i===lines.length-1?`<em>${l}</em>`:l).join('<br>')}</h1>
+      <p class="sec-sub">${hero.sub||''}</p>
+    </section>
+
+    ${stats.length?`<div class="stats">${stats.map(st=>`<div class="stat"><div class="stat-n">${st.value}</div><div class="stat-l">${st.label}</div></div>`).join('')}</div>`:''}
+
+    <section class="sec compact">
+      <div class="sec-hdr"><div class="sec-badge">Os nossos valores</div><h2 class="sec-title">O que nos <em>move</em></h2></div>
+      <div class="val-grid">
+        <div class="val-card"><div class="val-ico">🌿</div><div class="val-title">Autenticidade</div><div class="val-desc">Apenas produtos originais e certificados, sem excepções.</div></div>
+        <div class="val-card"><div class="val-ico">💎</div><div class="val-title">Qualidade</div><div class="val-desc">Seleccionamos cada produto com rigor e atenção ao detalhe.</div></div>
+        <div class="val-card"><div class="val-ico">❤️</div><div class="val-title">Cuidado</div><div class="val-desc">Cada cliente é tratada como única e especial para nós.</div></div>
+        <div class="val-card"><div class="val-ico">🌍</div><div class="val-title">Inclusividade</div><div class="val-desc">Beleza para todas as mulheres, tons e tipos de pele.</div></div>
+      </div>
+    </section>
+
+    <div class="divider mx"></div>
+
+    <section class="story-block">
+      <div class="sec-badge" style="display:inline-block;margin-bottom:12px">A nossa história</div>
+      <h2 style="font-family:var(--ff);font-size:1.3rem;margin-bottom:14px">Como tudo começou</h2>
+      <p style="font-size:.86rem;color:var(--muted);line-height:1.85;margin-bottom:20px">${sb?.story||''}</p>
+      <div class="tl" id="timeline"></div>
+    </section>
+
+    <div class="divider mx"></div>
+
+    <section class="sec compact">
+      <div class="mission-block">
+        <p class="mission-text">${sb?.mission||''}</p>
+        <div class="mission-author">— Fundadora, ${s.name}</div>
+      </div>
+    </section>
+
+    <div class="divider mx"></div>
+
+    <section class="sec compact">
+      <div class="sec-hdr"><div class="sec-badge">Contacto</div><h2 class="sec-title">Fale <em>connosco</em></h2></div>
+      <div class="contact-grid">
+        ${s.whatsapp?`<div class="contact-item" onclick="window.open('https://wa.me/${s.whatsapp.replace(/\D/g,'')}','_blank')"><div class="ci-ico"><i class="fa-brands fa-whatsapp"></i></div><div><div class="ci-label">WhatsApp</div><div class="ci-val">${s.phone||s.whatsapp}</div></div><i class="fa-solid fa-chevron-right" style="color:var(--muted);margin-left:auto;font-size:.78rem"></i></div>`:''}
+        ${s.email?`<div class="contact-item" onclick="window.open('mailto:${s.email}','_blank')"><div class="ci-ico"><i class="fa-regular fa-envelope"></i></div><div><div class="ci-label">Email</div><div class="ci-val">${s.email}</div></div><i class="fa-solid fa-chevron-right" style="color:var(--muted);margin-left:auto;font-size:.78rem"></i></div>`:''}
+        ${s.address?`<div class="contact-item"><div class="ci-ico"><i class="fa-solid fa-location-dot"></i></div><div><div class="ci-label">Localização</div><div class="ci-val">${s.address}</div></div></div>`:''}
+        ${s.instagram?`<div class="contact-item" onclick="window.open('https://instagram.com/${s.instagram.replace('@','')}','_blank')"><div class="ci-ico"><i class="fa-brands fa-instagram"></i></div><div><div class="ci-label">Instagram</div><div class="ci-val">@${s.instagram.replace('@','')}</div></div><i class="fa-solid fa-chevron-right" style="color:var(--muted);margin-left:auto;font-size:.78rem"></i></div>`:''}
+      </div>
+      <div style="margin-top:20px;padding:0 16px">
+        <button class="btn-primary w-full" onclick="location.href='catalogo.html'">Explorar o Catálogo →</button>
+      </div>
+    </section>
+
+    <div class="divider mx"></div>
+
+    <section class="sec compact">
+      <div class="sec-hdr"><div class="sec-badge">FAQ</div><h2 class="sec-title">Perguntas <em>frequentes</em></h2></div>
+      <div style="padding:0 16px" id="faq-list"></div>
+    </section>`;
+
+  // FAQ
+  const faqs=sb?.faq||[];
+  document.getElementById('faq-list').innerHTML=faqs.map(f=>`
+    <div class="acc-item">
+      <div class="acc-hdr" onclick="this.parentNode.classList.toggle('on')"><span>${f.q}</span><i class="fa-solid fa-chevron-down"></i></div>
+      <div class="acc-body">${f.a}</div>
+    </div>`).join('');
+}
+</script>
+</body>
+</html>

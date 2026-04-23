@@ -1,0 +1,161 @@
+<!DOCTYPE html>
+<html lang="pt-AO" data-theme="dark">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1.0">
+<title>Carrinho | Belle Cosméticos</title>
+<link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>✨</text></svg>">
+<script>(function(){document.documentElement.setAttribute('data-theme',localStorage.getItem('bl_theme')||'dark')})()</script>
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
+<link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,400;0,600;0,700;1,400;1,600&family=Plus+Jakarta+Sans:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="belle.css">
+<style>
+body{padding-top:56px;padding-bottom:88px;min-height:100vh}
+.p-header{position:fixed;top:0;left:0;right:0;z-index:100;height:56px;display:flex;align-items:center;justify-content:space-between;padding:0 14px;background:var(--glass);backdrop-filter:blur(20px);border-bottom:1px solid var(--border)}
+.cart-subtitle{font-size:.72rem;color:var(--muted);text-align:center;padding:8px 16px 0}
+.items-list{padding:12px 16px;display:flex;flex-direction:column;gap:10px}
+.cart-item{background:var(--card);border:1px solid var(--border);border-radius:var(--r);padding:12px;display:flex;gap:10px;align-items:center;animation:fade-up .3s both;transition:var(--tr)}
+.ci-img{width:64px;height:64px;border-radius:12px;background:var(--bg2);display:flex;align-items:center;justify-content:center;font-size:1.8rem;flex-shrink:0;overflow:hidden}
+.ci-img img{width:100%;height:100%;object-fit:cover}
+.ci-info{flex:1;min-width:0}
+.ci-name{font-weight:600;font-size:.86rem;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;margin-bottom:2px}
+.ci-unit{font-size:.7rem;color:var(--muted)}
+.ci-note{font-size:.67rem;color:var(--gold);font-style:italic;margin-top:2px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.ci-right{display:flex;flex-direction:column;align-items:flex-end;gap:6px;flex-shrink:0}
+.ci-total{font-family:var(--ff);font-size:.95rem;font-weight:700;color:var(--gold)}
+.ci-qty{display:flex;align-items:center;background:var(--bg2);border:1px solid var(--border);border-radius:50px;overflow:hidden}
+.qb{width:32px;height:32px;display:flex;align-items:center;justify-content:center;font-size:1rem;cursor:pointer;transition:color .2s}
+.qb:hover{color:var(--gold)}
+.qn{min-width:26px;text-align:center;font-size:.88rem;font-weight:700}
+.ci-del{font-size:.68rem;color:var(--red);border:1px solid rgba(217,80,96,.2);border-radius:6px;padding:2px 8px;cursor:pointer;transition:var(--tr);background:none}
+.ci-del:hover{background:rgba(217,80,96,.08)}
+
+/* Nota geral */
+.nota-box{margin:0 16px 12px;background:var(--card);border:1px solid var(--border);border-radius:var(--r);padding:14px}
+.nota-lbl{font-size:.76rem;font-weight:600;color:var(--muted);margin-bottom:8px;display:flex;align-items:center;gap:6px}
+.nota-ta{width:100%;background:var(--bg2);border:1px solid var(--border);border-radius:10px;padding:10px 12px;font-size:.82rem;color:var(--text);outline:none;resize:none;height:64px;font-family:var(--fb);transition:border-color .2s}
+.nota-ta:focus{border-color:var(--gold)}
+.nota-ta::placeholder{color:var(--muted)}
+
+/* Resumo */
+.resumo{margin:0 16px;background:var(--card);border:1px solid var(--border);border-radius:var(--r);padding:16px}
+.rrow{display:flex;justify-content:space-between;padding:7px 0;border-bottom:1px solid var(--border);font-size:.84rem}
+.rrow:last-of-type{border-bottom:none}
+.rl{color:var(--muted)}.rv{font-weight:600}
+.rv.free{color:var(--sage)}
+.rtotal{display:flex;justify-content:space-between;align-items:center;padding-top:12px;margin-top:8px;border-top:2px solid var(--border)}
+.rtl{font-family:var(--ff);font-size:.95rem;font-weight:700}
+.rtv{font-family:var(--ff);font-size:1.4rem;font-weight:700;color:var(--gold)}
+
+/* Bottom bar */
+.buy-bar{position:fixed;bottom:0;left:0;right:0;z-index:100;padding:10px 16px 16px;background:var(--glass);backdrop-filter:blur(20px);border-top:1px solid var(--border);display:flex;gap:10px}
+.btn-back-sm{width:44px;height:44px;flex-shrink:0;border:1px solid var(--border);border-radius:50%;display:flex;align-items:center;justify-content:center;cursor:pointer;color:var(--text);font-size:.9rem;transition:var(--tr)}
+.btn-back-sm:hover{border-color:var(--gold);color:var(--gold)}
+.btn-checkout{flex:1;height:44px;background:linear-gradient(135deg,var(--sage),#5a9e6a);border:none;border-radius:50px;font-size:.88rem;font-weight:700;color:#fff;cursor:pointer;transition:var(--tr);box-shadow:0 6px 20px rgba(122,158,130,.3)}
+.btn-checkout:hover{transform:translateY(-1px);box-shadow:0 10px 28px rgba(122,158,130,.4)}
+</style>
+</head>
+<body>
+
+<header class="p-header">
+  <button class="nav-btn" onclick="history.back()"><i class="fa-solid fa-arrow-left"></i></button>
+  <span style="font-family:var(--ff);font-size:1.05rem;font-weight:700">Carrinho</span>
+  <button class="nav-btn" onclick="Theme.toggle()"><i data-theme-ico class="fa-solid fa-moon"></i></button>
+</header>
+
+<div class="cart-subtitle" id="cart-subtitle"></div>
+<div id="cart-content"></div>
+
+<div class="buy-bar" id="buy-bar" style="display:none">
+  <button class="btn-back-sm" onclick="history.back()"><i class="fa-solid fa-arrow-left"></i></button>
+  <button class="btn-checkout" onclick="checkout()"><i class="fa-solid fa-lock" style="margin-right:6px"></i>Finalizar Encomenda</button>
+</div>
+
+<div id="bl-toast"></div>
+<script src="belle.js"></script>
+<script>
+let _items;
+
+document.addEventListener('DOMContentLoaded', () => {
+  Theme.init();
+  _items = Cart.get();
+  render();
+  window.addEventListener('bl:cart', () => { _items = Cart.get(); render(); });
+});
+
+function render() {
+  const el = document.getElementById('cart-content');
+  const bar = document.getElementById('buy-bar');
+  const sub = document.getElementById('cart-subtitle');
+
+  if (!_items.length) {
+    bar.style.display = 'none';
+    sub.textContent = '';
+    el.innerHTML = `<div class="empty-state">
+      <div class="empty-ico">🛍️</div>
+      <div class="empty-title">Carrinho vazio</div>
+      <div class="empty-sub">Adicione produtos ao carrinho para continuar a sua encomenda.</div>
+      <button class="btn-primary" onclick="location.href='catalogo.html'">Explorar Catálogo →</button>
+    </div>`;
+    return;
+  }
+
+  bar.style.display = 'flex';
+  const subTotal = Cart.total();
+  const deliveryFee = subTotal >= STORE.freeAbove ? 0 : STORE.deliveryFee;
+  const total = subTotal + deliveryFee;
+  const count = Cart.count();
+
+  sub.textContent = `${count} produto${count!==1?'s':''} · ${kz(subTotal)}`;
+
+  let html = '<div class="items-list">';
+  _items.forEach((item, i) => {
+    html += `<div class="cart-item" style="animation-delay:${i*.05}s">
+      <div class="ci-img">${item.image ? `<img src="${item.image}" alt="" loading="lazy" onerror="this.style.display='none'">` : ''}${item.emoji}</div>
+      <div class="ci-info">
+        <div class="ci-name">${item.name}</div>
+        <div class="ci-unit">${kz(item.price)} / un.</div>
+        ${item.note ? `<div class="ci-note">📝 ${item.note}</div>` : ''}
+      </div>
+      <div class="ci-right">
+        <div class="ci-total">${kz(item.price * item.qty)}</div>
+        <div class="ci-qty">
+          <button class="qb" onclick="adj('${item.key}',-1)">−</button>
+          <span class="qn">${item.qty}</span>
+          <button class="qb" onclick="adj('${item.key}',1)">+</button>
+        </div>
+        <button class="ci-del" onclick="rem('${item.key}','${item.name.replace(/'/g,"\\'")}')"><i class="fa-solid fa-trash-can"></i> Remover</button>
+      </div>
+    </div>`;
+  });
+  html += '</div>';
+
+  const nota = localStorage.getItem('bl_order_note') || '';
+  html += `<div class="nota-box">
+    <div class="nota-lbl"><i class="fa-regular fa-note-sticky"></i> Nota da encomenda</div>
+    <textarea class="nota-ta" placeholder="Observações gerais, instruções especiais..." oninput="localStorage.setItem('bl_order_note',this.value)">${nota}</textarea>
+  </div>`;
+
+  html += `<div class="resumo">
+    <div class="rrow"><span class="rl">Subtotal (${count} itens)</span><span class="rv">${kz(subTotal)}</span></div>
+    <div class="rrow"><span class="rl">Taxa de entrega</span><span class="rv ${deliveryFee===0?'free':''}">${deliveryFee===0?'Grátis':kz(deliveryFee)}</span></div>
+    ${deliveryFee>0?`<div class="rrow" style="font-size:.72rem"><span class="rl">💡 Compras acima de ${kz(STORE.freeAbove)}</span><span class="rv free" style="font-size:.72rem">entrega grátis</span></div>`:''}
+    <div class="rtotal">
+      <span class="rtl">Total</span>
+      <span class="rtv">${kz(total)}</span>
+    </div>
+  </div><div style="height:16px"></div>`;
+
+  el.innerHTML = html;
+}
+
+function adj(key, d) { Cart.update(key, (_items.find(i=>i.key===key)?.qty||1)+d); }
+function rem(key, name) { Cart.remove(key); toast(`${name} removido`, 'err'); }
+function checkout() {
+  if (!Cart.count()) { toast('Carrinho vazio!', 'err'); return; }
+  if (!Session.is()) { location.href = 'conta.html?next=checkout.html'; return; }
+  location.href = 'checkout.html';
+}
+</script>
+</body>
+</html>

@@ -1,0 +1,269 @@
+<!DOCTYPE html>
+<html lang="pt-AO" data-theme="dark">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1.0">
+<title>Finalizar Encomenda | Belle Cosméticos</title>
+<link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>✨</text></svg>">
+<script>(function(){document.documentElement.setAttribute('data-theme',localStorage.getItem('bl_theme')||'dark')})()</script>
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
+<link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,400;0,600;0,700;1,400;1,600&family=Plus+Jakarta+Sans:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="belle.css">
+<style>
+body{padding-top:56px;padding-bottom:100px;min-height:100vh}
+.p-header{position:fixed;top:0;left:0;right:0;z-index:100;height:56px;display:flex;align-items:center;justify-content:space-between;padding:0 14px;background:var(--glass);backdrop-filter:blur(20px);border-bottom:1px solid var(--border)}
+.steps{display:flex;align-items:center;padding:16px;gap:0;position:relative}
+.step{display:flex;align-items:center;flex:1;position:relative}
+.step-dot{width:28px;height:28px;border-radius:50%;border:2px solid var(--border);display:flex;align-items:center;justify-content:center;font-size:.7rem;font-weight:700;flex-shrink:0;background:var(--bg);z-index:1;transition:var(--tr)}
+.step.done .step-dot{background:var(--sage);border-color:var(--sage);color:#fff}
+.step.active .step-dot{background:var(--gold);border-color:var(--gold);color:#09080a}
+.step-line{flex:1;height:2px;background:var(--border);margin:0 4px}
+.step.done .step-line{background:var(--sage)}
+.step-lbl{position:absolute;top:34px;left:50%;transform:translateX(-50%);font-size:.58rem;color:var(--muted);white-space:nowrap;font-weight:600}
+.step.active .step-lbl,.step.done .step-lbl{color:var(--text)}
+.section-title{font-family:var(--ff);font-size:1.1rem;font-weight:700;padding:16px 16px 12px;border-bottom:1px solid var(--border)}
+.form-area{padding:16px}
+/* Order summary mini */
+.order-mini{margin:12px 16px;background:var(--card);border:1px solid var(--border);border-radius:var(--r)}
+.om-toggle{display:flex;align-items:center;justify-content:space-between;padding:14px;cursor:pointer;font-size:.84rem;font-weight:600}
+.om-total{font-family:var(--ff);font-weight:700;color:var(--gold);font-size:.95rem}
+.om-items{padding:0 14px 14px;display:none}
+.om-items.on{display:block}
+.om-item{display:flex;align-items:center;gap:10px;padding:8px 0;border-top:1px solid var(--border);font-size:.8rem}
+.om-item-img{width:40px;height:40px;border-radius:8px;background:var(--bg2);display:flex;align-items:center;justify-content:center;font-size:1.2rem;overflow:hidden;flex-shrink:0}
+.om-item-img img{width:100%;height:100%;object-fit:cover}
+.om-item-name{flex:1;font-size:.78rem;line-height:1.3}
+.om-item-price{font-weight:700;color:var(--gold);font-size:.82rem}
+/* Pay bottom */
+.pay-bar{position:fixed;bottom:0;left:0;right:0;z-index:100;padding:10px 16px 20px;background:var(--glass);backdrop-filter:blur(20px);border-top:1px solid var(--border)}
+.btn-pay{width:100%;height:48px;background:linear-gradient(135deg,var(--sage),#5a9e6a);border:none;border-radius:50px;font-size:.95rem;font-weight:700;color:#fff;cursor:pointer;transition:var(--tr);box-shadow:0 6px 20px rgba(122,158,130,.3);display:flex;align-items:center;justify-content:center;gap:8px}
+.btn-pay:hover{transform:translateY(-1px);box-shadow:0 10px 28px rgba(122,158,130,.4)}
+.btn-pay:disabled{opacity:.5;cursor:not-allowed;transform:none}
+.secure-note{text-align:center;font-size:.65rem;color:var(--muted);margin-top:6px;display:flex;align-items:center;justify-content:center;gap:5px}
+</style>
+</head>
+<body>
+<header class="p-header">
+  <button class="nav-btn" onclick="history.back()"><i class="fa-solid fa-arrow-left"></i></button>
+  <span style="font-family:var(--ff);font-size:1.05rem;font-weight:700">Finalizar Encomenda</span>
+  <div style="width:36px"></div>
+</header>
+
+<!-- Steps -->
+<div class="steps" style="margin-top:8px">
+  <div class="step active" id="s1"><div class="step-dot">1</div><div class="step-lbl">Dados</div></div>
+  <div class="step-line"></div>
+  <div class="step" id="s2"><div class="step-dot">2</div><div class="step-lbl">Pagamento</div></div>
+  <div class="step-line" id="sl2"></div>
+  <div class="step" id="s3"><div class="step-dot">3</div><div class="step-lbl">Confirmação</div></div>
+</div>
+<div style="height:28px"></div>
+
+<!-- Order summary -->
+<div class="order-mini">
+  <div class="om-toggle" onclick="toggleSummary()">
+    <span><i class="fa-solid fa-bag-shopping" style="margin-right:6px;color:var(--gold)"></i>Resumo do pedido</span>
+    <div style="display:flex;align-items:center;gap:8px">
+      <span class="om-total" id="om-total"></span>
+      <i class="fa-solid fa-chevron-down" id="om-chev" style="color:var(--muted);font-size:.78rem;transition:transform .25s"></i>
+    </div>
+  </div>
+  <div class="om-items" id="om-items"></div>
+</div>
+
+<!-- Step 1: Contact Info -->
+<div id="step1-content">
+  <div class="section-title">Informação de contacto</div>
+  <div class="form-area">
+    <div class="form-group">
+      <label class="form-label">Nome completo <span>*</span></label>
+      <input class="form-input" id="f-name" type="text" placeholder="O seu nome completo">
+    </div>
+    <div class="form-group">
+      <label class="form-label">Telefone <span>*</span></label>
+      <input class="form-input" id="f-phone" type="tel" placeholder="+244 9XX XXX XXX">
+    </div>
+    <div class="form-group">
+      <label class="form-label">Email</label>
+      <input class="form-input" id="f-email" type="email" placeholder="email@exemplo.com">
+    </div>
+    <div class="form-group">
+      <label class="form-label">Endereço de entrega <span>*</span></label>
+      <input class="form-input" id="f-addr" type="text" placeholder="Rua, número, bairro...">
+    </div>
+    <div class="form-group">
+      <label class="form-label">Cidade / Município</label>
+      <select class="form-input" id="f-city">
+        <option value="">Seleccionar cidade</option>
+        <option>Luanda — Ingombota</option>
+        <option>Luanda — Maianga</option>
+        <option>Luanda — Rangel</option>
+        <option>Luanda — Kilamba Kiaxi</option>
+        <option>Luanda — Samba</option>
+        <option>Luanda — Cazenga</option>
+        <option>Luanda — Belas</option>
+        <option>Benguela</option>
+        <option>Lubango</option>
+        <option>Huambo</option>
+        <option>Cabinda</option>
+        <option>Malanje</option>
+        <option>Outra cidade</option>
+      </select>
+    </div>
+    <div class="form-group">
+      <label class="form-label">Notas adicionais</label>
+      <textarea class="form-input" id="f-notes" placeholder="Instruções especiais para a entrega..."></textarea>
+    </div>
+    <label style="display:flex;align-items:flex-start;gap:10px;cursor:pointer;font-size:.8rem;color:var(--muted)">
+      <input type="checkbox" id="f-save" checked style="margin-top:3px;accent-color:var(--gold)">
+      Guardar os meus dados para encomendas futuras
+    </label>
+  </div>
+</div>
+
+<!-- Step 2: Payment (hidden) -->
+<div id="step2-content" style="display:none">
+  <div class="section-title">Método de pagamento</div>
+  <div class="form-area">
+    <div class="pay-opt" id="po-trans" onclick="selectPay('transferencia')">
+      <div class="pay-radio"></div>
+      <div><div class="pay-info-title">🏦 Transferência Bancária</div><div class="pay-info-sub">Banco BFA · IBAN: AO06 0038 0000 XXXX XXXX 1013 · À ordem de Belle Cosméticos</div></div>
+    </div>
+    <div class="pay-opt" id="po-multi" onclick="selectPay('referencia')">
+      <div class="pay-radio"></div>
+      <div><div class="pay-info-title">💳 Referência Multicaixa</div><div class="pay-info-sub">Receberá uma referência por WhatsApp para pagar em qualquer ATM ou app Multicaixa Express</div></div>
+    </div>
+    <div class="pay-opt on" id="po-entrega" onclick="selectPay('na_entrega')">
+      <div class="pay-radio" style="border-color:var(--gold);background:var(--gold)"><span style="width:6px;height:6px;border-radius:50%;background:#09080a;display:block"></span></div>
+      <div><div class="pay-info-title">💵 Pagamento na Entrega</div><div class="pay-info-sub">Pague em dinheiro ou Multicaixa Express quando receber a sua encomenda. Disponível em Luanda.</div></div>
+    </div>
+  </div>
+  <div class="section-title" style="margin-top:4px">Resumo final</div>
+  <div class="form-area" id="final-summary"></div>
+</div>
+
+<div class="pay-bar">
+  <button class="btn-pay" id="pay-btn" onclick="nextStep()">
+    <i class="fa-solid fa-arrow-right"></i> Continuar
+  </button>
+  <div class="secure-note"><i class="fa-solid fa-lock"></i> Pagamento seguro · Os seus dados estão protegidos</div>
+</div>
+
+<div id="bl-toast"></div>
+<script src="belle.js"></script>
+<script>
+let _step = 1, _payMethod = 'na_entrega';
+
+document.addEventListener('DOMContentLoaded', () => {
+  Theme.init();
+  if (!Cart.count()) { location.href = 'carrinho.html'; return; }
+  // Pre-fill from session
+  const sess = Session.get();
+  if (sess) {
+    if (sess.name)  document.getElementById('f-name').value  = sess.name;
+    if (sess.phone) document.getElementById('f-phone').value = sess.phone;
+    if (sess.email) document.getElementById('f-email').value = sess.email;
+    if (sess.address) document.getElementById('f-addr').value = sess.address;
+  }
+  renderSummary();
+});
+
+function renderSummary() {
+  const items = Cart.get();
+  const sub = Cart.total();
+  const delivery = sub >= STORE.freeAbove ? 0 : STORE.deliveryFee;
+  const total = sub + delivery;
+  document.getElementById('om-total').textContent = kz(total);
+  document.getElementById('om-items').innerHTML = items.map(it => `
+    <div class="om-item">
+      <div class="om-item-img">${it.image?`<img src="${it.image}" alt="" loading="lazy" onerror="this.style.display='none'">`:''} ${it.emoji}</div>
+      <div class="om-item-name">${it.name} <span style="color:var(--muted)">×${it.qty}</span></div>
+      <div class="om-item-price">${kz(it.price*it.qty)}</div>
+    </div>`).join('') +
+    `<div style="display:flex;justify-content:space-between;padding:10px 0 0;font-size:.8rem"><span style="color:var(--muted)">Entrega</span><span style="font-weight:600;color:${delivery===0?'var(--sage)':'var(--text)'}">${delivery===0?'Grátis':kz(delivery)}</span></div>
+    <div style="display:flex;justify-content:space-between;padding:8px 0 0;border-top:1px solid var(--border);margin-top:8px"><span style="font-family:var(--ff);font-weight:700">Total</span><span style="font-family:var(--ff);font-weight:700;color:var(--gold);font-size:1.05rem">${kz(total)}</span></div>`;
+}
+
+function toggleSummary() {
+  const el = document.getElementById('om-items');
+  const ch = document.getElementById('om-chev');
+  el.classList.toggle('on');
+  ch.style.transform = el.classList.contains('on') ? 'rotate(180deg)' : '';
+}
+
+function selectPay(m) {
+  _payMethod = m;
+  ['trans','multi','entrega'].forEach(k => document.getElementById('po-'+k).classList.remove('on'));
+  const map = {transferencia:'trans',referencia:'multi',na_entrega:'entrega'};
+  document.getElementById('po-'+map[m]).classList.add('on');
+  document.querySelectorAll('.pay-opt .pay-radio').forEach(r => r.innerHTML = '');
+  document.querySelector('#po-'+map[m]+' .pay-radio').style.borderColor = 'var(--gold)';
+  document.querySelector('#po-'+map[m]+' .pay-radio').style.background = 'var(--gold)';
+  document.querySelector('#po-'+map[m]+' .pay-radio').innerHTML = '<span style="width:6px;height:6px;border-radius:50%;background:#09080a;display:block"></span>';
+}
+
+function nextStep() {
+  if (_step === 1) {
+    const name  = document.getElementById('f-name').value.trim();
+    const phone = document.getElementById('f-phone').value.trim();
+    const addr  = document.getElementById('f-addr').value.trim();
+    if (!name)  { toast('Introduza o seu nome', 'err'); document.getElementById('f-name').focus(); return; }
+    if (!phone) { toast('Introduza o seu telefone', 'err'); document.getElementById('f-phone').focus(); return; }
+    if (!addr)  { toast('Introduza o endereço de entrega', 'err'); document.getElementById('f-addr').focus(); return; }
+    if (document.getElementById('f-save').checked) {
+      Session.set({ name, phone, email: document.getElementById('f-email').value.trim(), address: addr });
+    }
+    goStep2();
+  } else {
+    placeOrder();
+  }
+}
+
+function goStep2() {
+  _step = 2;
+  document.getElementById('step1-content').style.display = 'none';
+  document.getElementById('step2-content').style.display = 'block';
+  document.getElementById('s1').classList.add('done'); document.getElementById('s1').classList.remove('active');
+  document.getElementById('s2').classList.add('active');
+  document.getElementById('sl2').style.background = 'var(--sage)';
+  document.getElementById('pay-btn').innerHTML = '<i class="fa-solid fa-lock"></i> Confirmar Encomenda';
+  // Final summary
+  const sub = Cart.total(), delivery = sub >= STORE.freeAbove ? 0 : STORE.deliveryFee;
+  const sess = Session.get() || {};
+  document.getElementById('final-summary').innerHTML = `
+    <div class="rrow"><span class="rl">Nome</span><span class="rv">${sess.name||''}</span></div>
+    <div class="rrow"><span class="rl">Telefone</span><span class="rv">${sess.phone||''}</span></div>
+    <div class="rrow"><span class="rl">Endereço</span><span class="rv">${sess.address||''}</span></div>
+    <div class="rrow"><span class="rl">Subtotal</span><span class="rv">${kz(sub)}</span></div>
+    <div class="rrow"><span class="rl">Entrega</span><span class="rv ${delivery===0?'free':''}">${delivery===0?'Grátis':kz(delivery)}</span></div>
+    <div class="rtotal"><span class="rtl">Total</span><span class="rtv">${kz(sub+delivery)}</span></div>`;
+}
+
+async function placeOrder() {
+  const btn = document.getElementById('pay-btn');
+  btn.disabled = true;
+  btn.innerHTML = '<div class="spinner" style="width:20px;height:20px"></div>';
+  try {
+    const sess = Session.get() || {};
+    const items = Cart.get();
+    const sub = Cart.total(), delivery = sub >= STORE.freeAbove ? 0 : STORE.deliveryFee;
+    const orderData = {
+      customer: { name: sess.name, phone: sess.phone, email: sess.email||'', address: sess.address },
+      items: items.map(i => ({ id:i.id, name:i.name, price:i.price, qty:i.qty, subtotal:i.price*i.qty })),
+      subtotal: sub, delivery_fee: delivery, total: sub + delivery,
+      payment_method: _payMethod,
+      notes: localStorage.getItem('bl_order_note')||'',
+    };
+    const order = await API.createOrder(orderData);
+    Cart.clear();
+    localStorage.removeItem('bl_order_note');
+    location.href = `confirmacao.html?ref=${order.reference}`;
+  } catch(e) {
+    toast('Erro ao processar encomenda. Tente novamente.', 'err');
+    btn.disabled = false;
+    btn.innerHTML = '<i class="fa-solid fa-lock"></i> Confirmar Encomenda';
+  }
+}
+</script>
+</body>
+</html>

@@ -1,0 +1,265 @@
+<!DOCTYPE html>
+<html lang="pt-AO" data-theme="dark">
+<head>
+<meta charset="UTF-8"><meta name="viewport" content="width=device-width,initial-scale=1.0">
+<meta name="description" content="Belle Cosméticos — Cosméticos premium em Luanda, Angola.">
+<title>Belle Cosméticos</title>
+<link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>✨</text></svg>">
+<script>(function(){document.documentElement.setAttribute('data-theme',localStorage.getItem('bl_theme')||'dark')})()</script>
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
+<link href="https://fonts.googleapis.com/css2?family=Fredoka+One&family=Nunito:wght@400;600;700;800;900&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="belle.css">
+<style>
+/* HERO */
+.hero{min-height:calc(100vh - 54px);display:flex;flex-direction:column;align-items:center;justify-content:center;text-align:center;padding:60px 20px 80px;position:relative;overflow:hidden}
+.hero-bg{position:absolute;inset:0;z-index:0}
+.orb{position:absolute;border-radius:50%;filter:blur(90px);animation:orb-float 10s ease-in-out infinite}
+.orb1{width:380px;height:380px;background:rgba(232,96,154,.15);top:-100px;right:-100px}
+.orb2{width:300px;height:300px;background:rgba(155,70,212,.1);bottom:-80px;left:-80px;animation-delay:-4s}
+.orb3{width:200px;height:200px;background:rgba(6,214,160,.08);top:40%;left:10%;animation-delay:-7s}
+.hero-inner{position:relative;z-index:1;max-width:480px}
+.hero-badge{display:inline-flex;align-items:center;gap:8px;background:rgba(232,96,154,.1);border:1px solid rgba(232,96,154,.22);border-radius:50px;padding:6px 16px;font-size:.68rem;font-weight:700;color:var(--pink);letter-spacing:.5px;text-transform:uppercase;margin-bottom:18px;animation:fade-up .7s .1s both}
+.hero-title{font-family:var(--ff);font-size:clamp(2.8rem,13vw,5rem);line-height:1.05;margin-bottom:14px;animation:fade-up .7s .2s both}
+.hero-title em{font-style:normal;background:var(--grad);-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text}
+.hero-sub{font-size:.95rem;color:var(--muted);line-height:1.75;max-width:320px;margin:0 auto 30px;animation:fade-up .7s .3s both}
+.hero-btns{display:flex;gap:12px;justify-content:center;flex-wrap:wrap;margin-bottom:36px;animation:fade-up .7s .4s both}
+.fc{position:absolute;background:rgba(13,13,26,.85);backdrop-filter:blur(12px);border:1px solid var(--border);border-radius:14px;padding:10px 14px;text-align:left;box-shadow:0 8px 32px rgba(0,0,0,.3);animation:orb-float 9s ease-in-out infinite;z-index:1;pointer-events:none}
+.fc1{top:20%;left:2%;animation-delay:0s}
+.fc2{top:62%;right:2%;animation-delay:-3.5s}
+.fc-ico{font-size:1.3rem;margin-bottom:3px}
+.fc-lbl{font-size:.56rem;color:var(--muted)}
+.fc-val{font-size:.8rem;font-weight:700;color:var(--pink)}
+.scroll-ind{position:absolute;bottom:20px;left:50%;transform:translateX(-50%);display:flex;flex-direction:column;align-items:center;gap:4px;color:var(--muted);font-size:.6rem;letter-spacing:1px;text-transform:uppercase;animation:fade-in .8s .9s both}
+@keyframes bounce{0%,100%{transform:translateY(0)}50%{transform:translateY(5px)}}
+.scroll-ind i{animation:bounce 2s ease-in-out infinite}
+
+/* STATS */
+.stats{display:grid;grid-template-columns:repeat(3,1fr);background:var(--border)}
+.stat{background:var(--card);padding:20px 10px;text-align:center}
+.stat-n{font-family:var(--ff);font-size:1.8rem;background:var(--grad);-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text;line-height:1}
+.stat-l{font-size:.58rem;font-weight:700;text-transform:uppercase;letter-spacing:.5px;color:var(--muted);margin-top:4px}
+
+/* CATS */
+.cats-row{overflow-x:auto;scrollbar-width:none;padding:0 16px}
+.cats-row::-webkit-scrollbar{display:none}
+.cats-inner{display:flex;gap:10px;width:max-content;padding-bottom:4px}
+.cat-pill{display:flex;flex-direction:column;align-items:center;background:var(--card);border:1px solid var(--border);border-radius:16px;padding:18px 16px;cursor:pointer;transition:var(--tr);min-width:84px}
+.cat-pill:hover{border-color:rgba(232,96,154,.4);transform:translateY(-2px)}
+.cat-emoji{font-size:1.8rem;margin-bottom:7px}
+.cat-name{font-size:.68rem;font-weight:700;text-align:center;line-height:1.3}
+.cat-count{font-size:.6rem;color:var(--muted);margin-top:2px}
+
+/* FEATURES */
+.feats{display:grid;grid-template-columns:repeat(2,1fr);gap:12px}
+.feat{background:var(--card);border:1px solid var(--border);border-radius:var(--r);padding:20px 14px;transition:var(--tr)}
+.feat:hover{border-color:rgba(232,96,154,.25)}
+.feat-ico{font-size:1.6rem;margin-bottom:10px}
+.feat-title{font-family:var(--ff);font-size:.95rem;color:var(--text);margin-bottom:4px}
+.feat-desc{font-size:.74rem;color:var(--muted);line-height:1.65}
+
+/* DEPS */
+.deps-row{overflow-x:auto;scrollbar-width:none;padding:0 16px}
+.deps-row::-webkit-scrollbar{display:none}
+.deps-inner{display:flex;gap:12px;width:max-content;padding-bottom:4px}
+.dep{background:var(--card);border:1px solid var(--border);border-radius:var(--r);padding:20px;width:270px;flex-shrink:0}
+.dep-stars{color:var(--yellow);font-size:.82rem;margin-bottom:10px}
+.dep-txt{font-size:.84rem;color:var(--text);line-height:1.7;font-style:italic;margin-bottom:14px}
+.dep-autor{display:flex;align-items:center;gap:10px}
+.dep-av{width:34px;height:34px;border-radius:50%;background:var(--grad);display:flex;align-items:center;justify-content:center;font-size:.95rem}
+.dep-name{font-size:.78rem;font-weight:700}
+.dep-loc{font-size:.64rem;color:var(--muted)}
+
+/* CTA */
+.cta-block{margin:0 16px;background:var(--card);border:1px solid var(--border);border-radius:24px;padding:40px 20px;text-align:center;position:relative;overflow:hidden}
+.cta-block::before{content:'';position:absolute;inset:0;background:linear-gradient(135deg,rgba(232,96,154,.05),rgba(155,70,212,.04));pointer-events:none}
+.cta-ico{font-size:2.5rem;margin-bottom:12px}
+.cta-title{font-family:var(--ff);font-size:1.8rem;line-height:1.1;margin-bottom:10px}
+.cta-title em{background:var(--grad);-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text}
+.cta-sub{font-size:.86rem;color:var(--muted);line-height:1.7;margin-bottom:24px;max-width:300px;margin-left:auto;margin-right:auto}
+
+.see-all{text-align:center;padding:16px 0 4px}
+.btn-see-all{display:inline-flex;align-items:center;gap:8px;padding:11px 22px;border:1px solid var(--border);border-radius:50px;font-size:.82rem;color:var(--muted);cursor:pointer;transition:var(--tr)}
+.btn-see-all:hover{border-color:var(--pink);color:var(--pink)}
+</style>
+</head>
+<body>
+<nav class="nav">
+  <span class="nav-logo" onclick="location.href='index.html'" id="nav-logo">Belle</span>
+  <div class="nav-actions">
+    <button class="nav-btn" onclick="location.href='catalogo.html'" title="Catálogo"><i class="fa-solid fa-magnifying-glass"></i></button>
+    <button class="nav-btn" onclick="location.href='conta.html'" title="Conta"><i class="fa-regular fa-user"></i></button>
+    <button class="nav-btn" onclick="Theme.toggle()" title="Tema"><i data-theme-ico class="fa-solid fa-moon"></i></button>
+    <a href="carrinho.html" class="nav-btn" title="Carrinho"><i class="fa-solid fa-bag-shopping"></i><span class="bl-cart-badge">0</span></a>
+  </div>
+</nav>
+
+<div class="announce hide" id="announce"></div>
+
+<section class="hero pt-nav">
+  <div class="hero-bg">
+    <div class="orb orb1"></div><div class="orb orb2"></div><div class="orb orb3"></div>
+  </div>
+  <div class="fc fc1"><div class="fc-ico">⭐</div><div class="fc-lbl">Avaliação média</div><div class="fc-val">4.9 / 5.0</div></div>
+  <div class="fc fc2"><div class="fc-ico">🛍️</div><div class="fc-lbl">Pedidos este mês</div><div class="fc-val">+1.200</div></div>
+  <div class="hero-inner">
+    <div class="hero-badge" id="h-badge"></div>
+    <h1 class="hero-title" id="h-title"></h1>
+    <p class="hero-sub" id="h-sub"></p>
+    <div class="hero-btns">
+      <button class="btn-primary" id="h-btn1" onclick="location.href='catalogo.html'"></button>
+      <button class="btn-ghost" id="h-btn2" onclick="location.href='sobre.html'"></button>
+    </div>
+  </div>
+  <div class="scroll-ind"><span>Descobrir</span><i class="fa-solid fa-chevron-down"></i></div>
+</section>
+
+<div class="stats" id="stats-row"></div>
+
+<section class="sec compact">
+  <div class="sec-hdr"><div class="sec-badge" id="cats-badge"></div><h2 class="sec-title" id="cats-title"></h2><p class="sec-sub" id="cats-sub"></p></div>
+  <div class="cats-row"><div class="cats-inner" id="cats-inner"></div></div>
+</section>
+
+<div class="divider mx"></div>
+
+<section class="sec compact">
+  <div class="sec-hdr"><div class="sec-badge">Mais vendidos</div><h2 class="sec-title">Escolhas <em>populares</em></h2><p class="sec-sub">Os favoritos das nossas clientes, agora ao seu alcance.</p></div>
+  <div class="prods-grid" id="prods-featured"></div>
+  <div class="see-all"><button class="btn-see-all" onclick="location.href='catalogo.html'">Ver todos os produtos <i class="fa-solid fa-arrow-right"></i></button></div>
+</section>
+
+<div class="divider mx"></div>
+
+<section class="sec compact">
+  <div class="sec-hdr"><div class="sec-badge" id="feat-badge"></div><h2 class="sec-title" id="feat-title"></h2></div>
+  <div class="feats p-16" id="feats-grid"></div>
+</section>
+
+<div class="divider mx"></div>
+
+<section class="sec compact">
+  <div class="sec-hdr"><div class="sec-badge" id="deps-badge"></div><h2 class="sec-title" id="deps-title"></h2></div>
+  <div class="deps-row"><div class="deps-inner" id="deps-inner"></div></div>
+</section>
+
+<div class="divider mx"></div>
+
+<section class="sec compact">
+  <div class="sec-hdr"><div class="sec-badge">Novidades</div><h2 class="sec-title">Acabaram de <em>chegar</em></h2></div>
+  <div class="prods-grid" id="prods-new"></div>
+</section>
+
+<div class="divider mx"></div>
+
+<section class="sec compact">
+  <div class="cta-block">
+    <div class="cta-ico" id="cta-ico"></div>
+    <h2 class="cta-title" id="cta-title"></h2>
+    <p class="cta-sub" id="cta-sub"></p>
+    <button class="btn-primary" id="cta-btn" onclick="location.href='catalogo.html'"></button>
+  </div>
+</section>
+
+<footer class="footer" id="footer"></footer>
+
+<div class="overlay" id="overlay" onclick="closeSheet()"></div>
+<div class="sheet" id="sheet">
+  <div class="sheet-handle"></div>
+  <div class="sh-img" id="sh-img"></div>
+  <div class="sh-cat" id="sh-cat"></div>
+  <div class="sh-name" id="sh-name"></div>
+  <div class="sh-price-row"><span class="sh-price" id="sh-price"></span><span class="sh-orig" id="sh-orig" style="display:none"></span><span class="sh-disc" id="sh-disc" style="display:none"></span></div>
+  <p class="sh-desc" id="sh-desc"></p>
+  <div class="sh-hls" id="sh-hls"></div>
+  <div class="qty-row"><span class="qty-lbl">Quantidade</span><div class="qty-ctrl"><button class="qty-btn" onclick="adjQty(-1)">−</button><span class="qty-v" id="qty-v">1</span><button class="qty-btn" onclick="adjQty(1)">+</button></div></div>
+  <textarea class="sh-note" id="sh-note" placeholder="Observações (opcional)..."></textarea>
+  <button class="btn-primary w-full" id="sh-btn" onclick="addToCart()">Adicionar ao Carrinho</button>
+  <button class="btn-ghost w-full mt-8" onclick="goToDetail()" style="padding:12px">Ver detalhes completos</button>
+</div>
+<div id="bl-toast"></div>
+<script src="belle.js"></script>
+<script>
+document.addEventListener('DOMContentLoaded', () => {
+  Theme.init();
+  renderAll();
+  window.addEventListener('bl:cms', renderAll);
+});
+
+function renderAll() {
+  const h = CMS.home(); const s = CMS.store();
+  document.getElementById('nav-logo').textContent = s.name;
+  document.title = `${s.name} — ${s.tagline}`;
+
+  // Announce
+  const an = h.announce;
+  const anEl = document.getElementById('announce');
+  if (an?.active && an?.text) { anEl.textContent = an.text; anEl.classList.remove('hide'); }
+  else anEl.classList.add('hide');
+
+  // Hero
+  const hero = h.hero || {};
+  document.getElementById('h-badge').textContent = hero.badge || '';
+  const lines = (hero.title||'').split('\n');
+  document.getElementById('h-title').innerHTML = lines.map((l,i)=> i===lines.length-1 ? `<em>${l}</em>` : l).join('<br>');
+  document.getElementById('h-sub').textContent  = hero.sub || '';
+  document.getElementById('h-btn1').textContent = hero.btn1 || 'Explorar Catálogo →';
+  document.getElementById('h-btn2').textContent = hero.btn2 || 'A nossa história';
+
+  // Stats
+  document.getElementById('stats-row').innerHTML = (h.stats||[]).map(st => `<div class="stat"><div class="stat-n">${st.value}</div><div class="stat-l">${st.label}</div></div>`).join('');
+
+  // Cats section
+  const cs = h.catsSec || {};
+  document.getElementById('cats-badge').textContent = cs.badge || 'Categorias';
+  const ct = (cs.title||'O que procura\nem hoje?').split('\n');
+  document.getElementById('cats-title').innerHTML = ct.map((l,i)=> i===ct.length-1?`<em>${l}</em>`:l).join('<br>');
+  document.getElementById('cats-sub').textContent = cs.sub || '';
+
+  // Categories
+  const cats = CMS.categories();
+  document.getElementById('cats-inner').innerHTML = cats.map(c => `
+    <div class="cat-pill" onclick="filterCat(${c.id})">
+      <span class="cat-emoji">${c.emoji}</span>
+      <div class="cat-name">${c.name}</div>
+      <div class="cat-count">${CMS.byCategory(c.id).length} produtos</div>
+    </div>`).join('');
+
+  // Featured products
+  document.getElementById('prods-featured').innerHTML = CMS.featured().slice(0,4).map((p,i) => buildProdCard(p, i*.06)).join('');
+
+  // Features
+  const fs = h.featSec || {};
+  document.getElementById('feat-badge').textContent = fs.badge || 'Porquê Belle';
+  const ft = (fs.title||'A diferença que\nse sente.').split('\n');
+  document.getElementById('feat-title').innerHTML = ft.map((l,i)=> i===ft.length-1?`<em>${l}</em>`:l).join('<br>');
+  document.getElementById('feats-grid').innerHTML = CMS.features().map(f => `
+    <div class="feat"><div class="feat-ico">${f.emoji}</div><div class="feat-title">${f.title}</div><div class="feat-desc">${f.desc}</div></div>`).join('');
+
+  // Testimonials
+  const ds = h.depsSec || {};
+  document.getElementById('deps-badge').textContent = ds.badge || 'Depoimentos reais';
+  const dt = (ds.title||'O que dizem as\nnossas clientes').split('\n');
+  document.getElementById('deps-title').innerHTML = dt.map((l,i)=> i===dt.length-1?`<em>${l}</em>`:l).join('<br>');
+  document.getElementById('deps-inner').innerHTML = CMS.testimonials().map(d => `
+    <div class="dep">
+      <div class="dep-stars">${'★'.repeat(d.stars||5)}${'☆'.repeat(5-(d.stars||5))}</div>
+      <p class="dep-txt">"${d.text}"</p>
+      <div class="dep-autor"><div class="dep-av">${d.av||'😊'}</div><div><div class="dep-name">${d.name}</div><div class="dep-loc">${d.loc}</div></div></div>
+    </div>`).join('');
+
+  // New arrivals
+  document.getElementById('prods-new').innerHTML = CMS.products().filter(p=>p.tag==='novo'&&p.active!==false).slice(0,4).map((p,i)=>buildProdCard(p,i*.06)).join('');
+
+  // CTA
+  const cta = h.ctaSec || {};
+  document.getElementById('cta-ico').textContent = cta.emoji || '✨';
+  const ctat = (cta.title||'Beleza que\nmerece.').split('\n');
+  document.getElementById('cta-title').innerHTML = ctat.map((l,i)=> i===ctat.length-1?`<em>${l}</em>`:l).join('<br>');
+  document.getElementById('cta-sub').textContent = cta.sub || '';
+  document.getElementById('cta-btn').textContent = cta.btn || 'Ver Catálogo →';
+}
+
+function filterCat(id) { sessionStorage.setItem('bl_cat_filter', id); location.href = 'catalogo.html'; }
+</script>
+</body>
+</html>
