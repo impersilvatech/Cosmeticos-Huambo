@@ -357,7 +357,7 @@ const Settings = {
   get()  { try { return JSON.parse(localStorage.getItem(this.K)||'{}'); } catch { return {}; } },
   set(d) { localStorage.setItem(this.K, JSON.stringify({...this.get(),...d})); },
   val(k) { return this.get()[k] || ''; },
-  verifyPin(pin) { const p = this.val('pin') || '1234'; return pin === p; },
+  verifyPin(pin) { const p = this.val('pin') || '123456789012'; return pin === p; },
   setPin(p)      { this.set({ pin: p }); },
 };
 
