@@ -27,9 +27,9 @@ body{font-family:var(--fb);background:var(--bg);color:var(--white);display:flex;
 .lsub{font-size:.75rem;color:var(--muted);margin-bottom:24px}
 .lcard{background:var(--card);border:1px solid var(--border);border-radius:var(--r3);padding:24px 22px}
 .lcard h2{font-family:var(--ft);font-size:1rem;color:var(--pink);margin-bottom:18px;display:flex;align-items:center;justify-content:center;gap:7px}
-.pin-dots{display:flex;gap:14px;justify-content:center;margin-bottom:22px}
-.pin-dot{width:16px;height:16px;border-radius:50%;border:2px solid var(--border);transition:var(--tr)}
-.pin-dot.f{background:var(--pink);border-color:var(--pink)}
+.pin-dots{display:flex;gap:10px;justify-content:center;margin-bottom:10px;flex-wrap:wrap;max-width:260px;margin-left:auto;margin-right:auto}
+.pin-dot{width:14px;height:14px;border-radius:50%;border:2px solid var(--border);transition:var(--tr);flex-shrink:0}
+.pin-dot.f{background:var(--pink);border-color:var(--pink);box-shadow:0 0 6px rgba(232,96,154,.5)}
 .pin-dot.e{background:var(--red);border-color:var(--red)}
 .numpad{display:grid;grid-template-columns:repeat(3,1fr);gap:9px}
 .npb{height:58px;border-radius:var(--r2);background:var(--card2);border:1.5px solid var(--border);font-family:var(--ft);font-size:1.35rem;cursor:pointer;transition:var(--tr);display:flex;align-items:center;justify-content:center;color:var(--white)}
@@ -278,7 +278,7 @@ input:checked + .sw-s::before{transform:translateX(18px)}
     <p class="lsub">Painel de Administração</p>
     <div class="lcard">
       <h2><i class="fa-solid fa-lock"></i> Acesso Restrito</h2>
-      <div class="pin-dots" id="pin-dots" style="gap:8px;flex-wrap:wrap;justify-content:center;max-width:260px;margin:0 auto 22px">
+      <div class="pin-dots" id="pin-dots">
         <div class="pin-dot" id="pd0"></div><div class="pin-dot" id="pd1"></div>
         <div class="pin-dot" id="pd2"></div><div class="pin-dot" id="pd3"></div>
         <div class="pin-dot" id="pd4"></div><div class="pin-dot" id="pd5"></div>
@@ -286,13 +286,20 @@ input:checked + .sw-s::before{transform:translateX(18px)}
         <div class="pin-dot" id="pd8"></div><div class="pin-dot" id="pd9"></div>
         <div class="pin-dot" id="pd10"></div><div class="pin-dot" id="pd11"></div>
       </div>
+      <!-- Hidden input shows typed digits -->
+      <div style="text-align:center;font-family:var(--ft);font-size:1.2rem;letter-spacing:6px;color:var(--pink);min-height:28px;margin-bottom:14px" id="pin-preview"></div>
       <div class="numpad">
-        <button class="npb" onclick="np(1)">1</button><button class="npb" onclick="np(2)">2</button><button class="npb" onclick="np(3)">3</button>
-        <button class="npb" onclick="np(4)">4</button><button class="npb" onclick="np(5)">5</button><button class="npb" onclick="np(6)">6</button>
-        <button class="npb" onclick="np(7)">7</button><button class="npb" onclick="np(8)">8</button><button class="npb" onclick="np(9)">9</button>
-        <div></div><button class="npb" onclick="np(0)">0</button>
+        <button class="npb" onclick="np('1')">1</button><button class="npb" onclick="np('2')">2</button><button class="npb" onclick="np('3')">3</button>
+        <button class="npb" onclick="np('4')">4</button><button class="npb" onclick="np('5')">5</button><button class="npb" onclick="np('6')">6</button>
+        <button class="npb" onclick="np('7')">7</button><button class="npb" onclick="np('8')">8</button><button class="npb" onclick="np('9')">9</button>
+        <button class="npb del" onclick="npClr()" title="Limpar">✕</button>
+        <button class="npb" onclick="np('0')">0</button>
         <button class="npb del" onclick="npDel()"><i class="fa-solid fa-delete-left"></i></button>
       </div>
+      <button class="btn-lg" onclick="verifyPin()" style="margin-top:14px">
+        <i class="fa-solid fa-arrow-right-to-bracket"></i> Entrar
+      </button>
+      <p style="font-size:.65rem;color:var(--muted2);text-align:center;margin-top:10px" id="l-err"></p>
     </div>
     <p class="lhint">PIN padrão: <strong>123456789012</strong></p>
   </div>
@@ -617,26 +624,68 @@ input:checked + .sw-s::before{transform:translateX(18px)}
 <script src="belle.js"></script>
 <script>
 /* ──────────────────────────────────
-   PIN LOGIN
+   PIN LOGIN — self-contained, no belle.js dependency
 ────────────────────────────────── */
 let _pin = '';
 const PIN_LEN = 12;
-function np(d) { if(_pin.length >= PIN_LEN) return; _pin += d; syncDots(); if(_pin.length === PIN_LEN) setTimeout(verifyPin, 200); }
-function npDel() { _pin = _pin.slice(0,-1); syncDots(); }
-function syncDots(err=false) { for(let i=0;i<PIN_LEN;i++){const d=document.getElementById('pd'+i);if(!d)continue;d.classList.toggle('f',i<_pin.length&&!err);d.classList.toggle('e',err);}}
+const PIN_DEFAULT = '123456789012';
+
+function _getStoredPin() {
+  try { return JSON.parse(localStorage.getItem('bl_settings')||'{}').pin || PIN_DEFAULT; } catch { return PIN_DEFAULT; }
+}
+
+function np(d) {
+  if (_pin.length >= PIN_LEN) return;
+  _pin += String(d);
+  syncDots();
+  updatePreview();
+}
+function npDel() {
+  _pin = _pin.slice(0, -1);
+  syncDots();
+  updatePreview();
+}
+function npClr() {
+  _pin = '';
+  syncDots();
+  updatePreview();
+}
+function updatePreview() {
+  const el = document.getElementById('pin-preview');
+  if (el) el.textContent = '●'.repeat(_pin.length) || '';
+}
+function syncDots(err=false) {
+  for (let i = 0; i < PIN_LEN; i++) {
+    const d = document.getElementById('pd' + i);
+    if (!d) continue;
+    d.className = 'pin-dot' + (err ? ' e' : (i < _pin.length ? ' f' : ''));
+  }
+}
 function verifyPin() {
-  if(Settings.verifyPin(_pin)){
-    Auth.set('adm_'+Date.now());
-    document.getElementById('ls').style.display='none';
+  if (!_pin) { showErr('Introduza o PIN'); return; }
+  const stored = _getStoredPin();
+  if (_pin === stored) {
+    document.getElementById('ls').style.display = 'none';
     document.getElementById('app').classList.add('on');
+    // Store auth token
+    try { localStorage.setItem('bl_admin_token', 'adm_' + Date.now()); } catch(e){}
     initAdmin();
   } else {
     syncDots(true);
-    setTimeout(()=>{ _pin=''; syncDots(); }, 800);
-    toast('PIN incorrecto','err');
+    showErr('PIN incorrecto');
+    setTimeout(() => { _pin = ''; syncDots(); updatePreview(); showErr(''); }, 1000);
   }
 }
-function doLogout() { Auth.clear(); location.reload(); }
+function showErr(msg) {
+  const el = document.getElementById('l-err');
+  if (el) el.textContent = msg;
+}
+function doLogout() {
+  try { localStorage.removeItem('bl_admin_token'); } catch(e){}
+  _pin = ''; syncDots(); updatePreview();
+  document.getElementById('app').classList.remove('on');
+  document.getElementById('ls').style.display = 'flex';
+}
 
 /* ──────────────────────────────────
    THEME
@@ -1299,10 +1348,16 @@ function changePin(){
   const old=document.getElementById('pin-old').value;
   const novo=document.getElementById('pin-new').value;
   const conf=document.getElementById('pin-conf').value;
-  if(!Settings.verifyPin(old)){toast('PIN actual incorrecto','err');return;}
-  if(!/^\d{12}$/.test(novo)){toast('Novo PIN deve ter 12 dígitos','err');return;}
+  const stored=_getStoredPin();
+  if(old!==stored){toast('PIN actual incorrecto','err');return;}
+  if(!/^\d{12}$/.test(novo)){toast('Novo PIN deve ter 12 dígitos numéricos','err');return;}
   if(novo!==conf){toast('PINs não coincidem','err');return;}
-  Settings.setPin(novo);toast('✓ PIN alterado com sucesso','ok');
+  try{
+    const s=JSON.parse(localStorage.getItem('bl_settings')||'{}');
+    s.pin=novo;
+    localStorage.setItem('bl_settings',JSON.stringify(s));
+  }catch(e){toast('Erro ao guardar','err');return;}
+  toast('✓ PIN alterado com sucesso','ok');
   ['pin-old','pin-new','pin-conf'].forEach(id=>{const el=document.getElementById(id);if(el)el.value='';});
 }
 
