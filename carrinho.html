@@ -101,8 +101,9 @@ function render() {
   }
 
   bar.style.display = 'flex';
+  const s = CMS.store();
   const subTotal = Cart.total();
-  const deliveryFee = subTotal >= STORE.freeAbove ? 0 : STORE.deliveryFee;
+  const deliveryFee = subTotal >= (s.freeAbove||10000) ? 0 : (s.deliveryFee||1000);
   const total = subTotal + deliveryFee;
   const count = Cart.count();
 
@@ -139,7 +140,7 @@ function render() {
   html += `<div class="resumo">
     <div class="rrow"><span class="rl">Subtotal (${count} itens)</span><span class="rv">${kz(subTotal)}</span></div>
     <div class="rrow"><span class="rl">Taxa de entrega</span><span class="rv ${deliveryFee===0?'free':''}">${deliveryFee===0?'Grátis':kz(deliveryFee)}</span></div>
-    ${deliveryFee>0?`<div class="rrow" style="font-size:.72rem"><span class="rl">💡 Compras acima de ${kz(STORE.freeAbove)}</span><span class="rv free" style="font-size:.72rem">entrega grátis</span></div>`:''}
+    ${deliveryFee>0?`<div class="rrow" style="font-size:.72rem"><span class="rl">💡 Compras acima de ${kz(s.freeAbove||10000)}</span><span class="rv free">entrega grátis</span></div>`:''}
     <div class="rtotal">
       <span class="rtl">Total</span>
       <span class="rtv">${kz(total)}</span>

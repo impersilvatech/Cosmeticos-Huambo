@@ -231,8 +231,11 @@ const CMS = {
   saveFaq(faqs) { this.set('sobre.faq', faqs); },
 };
 
-// ── STORE SHORTCUT ─────────────────────────────────────────────
-const STORE = () => CMS.store();
+// ── STORE SHORTCUT — works as both STORE.freeAbove and STORE() ─
+const STORE = new Proxy(function(){}, {
+  get: (_,k) => { const s = CMS.store(); return k in s ? s[k] : undefined; },
+  apply: ()  => CMS.store(),
+});
 
 // ── UTILITIES ──────────────────────────────────────────────────
 const kz = (n) => { if (typeof n !== 'number') return '—'; if (n === 0) return '0 Kz'; return n.toLocaleString('pt-AO') + ' Kz'; };
@@ -264,13 +267,29 @@ const toast = (msg, type = 'ok') => {
 const Cart = (() => {
   const K = 'bl_cart';
   const emit = () => window.dispatchEvent(new CustomEvent('bl:cart'));
-  const _get  = () => { try { return JSON.parse(localStorage.getItem(K) || '[]'); } catch { return []; } };
+  // Normalise item — handle both old format (preco/quantidade) and new (price/qty)
+  const _norm = (i) => ({
+    key:    i.key   || `${i.produto_id||i.id}_${Date.now()}`,
+    id:     i.id    || i.produto_id || 0,
+    name:   i.name  || i.nome  || '',
+    price:  parseFloat(i.price || i.preco || 0),
+    qty:    parseInt(i.qty    || i.quantidade || 1, 10),
+    image:  i.image || i.imagem || '',
+    emoji:  i.emoji || '✨',
+    note:   i.note  || i.nota  || '',
+  });
+  const _get  = () => { try { return (JSON.parse(localStorage.getItem(K) || '[]')).map(_norm); } catch { return []; } };
   const _save = (items) => { localStorage.setItem(K, JSON.stringify(items)); emit(); };
   return {
-    get: _get, count: () => _get().reduce((s,i) => s + i.qty, 0),
-    total: () => _get().reduce((s,i) => s + i.price * i.qty, 0),
+    get:   _get,
+    count: () => _get().reduce((s,i) => s + i.qty, 0),
+    total: () => _get().reduce((s,i) => s + (i.price * i.qty), 0),
     clear: () => { localStorage.removeItem(K); emit(); },
-    add(p, qty = 1, note = '') { const items = _get(); items.push({ key:`${p.id}_${Date.now()}`, id:p.id, name:p.name, price:p.price, qty, image:p.image||'', emoji:p.emoji||'✨', note }); _save(items); },
+    add(p, qty = 1, note = '') {
+      const items = _get();
+      items.push(_norm({ key:`${p.id}_${Date.now()}`, id:p.id, name:p.name, price:p.price, qty, image:p.image||'', emoji:p.emoji||'✨', note }));
+      _save(items);
+    },
     remove(key)      { _save(_get().filter(i => i.key !== key)); },
     update(key, qty) { const items = _get(); const it = items.find(i => i.key === key); if(it) it.qty = Math.max(1, Math.min(99, qty)); _save(items); },
   };

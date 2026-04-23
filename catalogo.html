@@ -10,6 +10,7 @@
 <link rel="stylesheet" href="belle.css">
 <style>
 body{padding-top:54px;padding-bottom:80px;min-height:100vh}
+/* JS will set correct padding-top after header renders */
 .hdr{position:fixed;top:0;left:0;right:0;z-index:100;background:var(--glass);backdrop-filter:blur(20px);border-bottom:1px solid var(--border)}
 .hdr-top{display:flex;align-items:center;gap:8px;padding:10px 14px;height:54px}
 .search-bar{position:relative;padding:0 14px 10px;border-bottom:1px solid var(--border)}
@@ -135,6 +136,13 @@ let _catActive='all',_search='',_sort=0,_wlMode=false,_viewMode='grid';
 
 document.addEventListener('DOMContentLoaded',()=>{
   Theme.init();
+  // Fix body padding to match actual fixed header height
+  const fixPadding = () => {
+    const h = document.querySelector('.hdr');
+    if (h) document.body.style.paddingTop = h.offsetHeight + 'px';
+  };
+  fixPadding();
+  window.addEventListener('resize', fixPadding);
   const cf=sessionStorage.getItem('bl_cat_filter');
   if(cf){_catActive=cf;sessionStorage.removeItem('bl_cat_filter');}
   buildTabs(); render(); syncCart(); syncWl();
