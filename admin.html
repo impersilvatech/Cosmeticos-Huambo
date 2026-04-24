@@ -568,17 +568,198 @@ input:checked + .sw-s::before{transform:translateX(18px)}
 </script>
 
 <!-- ══ SCRIPT 2: belle.js (opcional) ══ -->
-<script src="belle.js"></script>
+<script>
+/* ═══════════════════════════════════════════════════
+   BELLE DATA LAYER — embutido directamente no admin
+   (não depende de belle.js carregar)
+═══════════════════════════════════════════════════ */
+'use strict';
+
+const DATA_DEFAULTS = {
+  store:{ name:'Belle Cosméticos', tagline:'A sua beleza, elevada.', currency:'Kz', phone:'+244 923 000 000', whatsapp:'244923000000', email:'geral@belle.ao', address:'Rua Amílcar Cabral, Luanda, Angola', deliveryFee:1000, freeAbove:10000, instagram:'bellecosmeticos.ao', facebook:'', tiktok:'' },
+  home:{ announce:{ active:true, text:'🎁 Entrega grátis em compras acima de 10.000 Kz · Luanda em 24-48h' }, hero:{ badge:'🌟 Cosméticos Premium · Luanda, Angola', title:'A sua beleza,\nem destaque.', sub:'Produtos de beleza premium cuidadosamente seleccionados para realçar a beleza natural da mulher angolana.', btn1:'Explorar Catálogo →', btn2:'A nossa história' }, stats:[{ value:'2.5K+', label:'Clientes satisfeitas' },{ value:'150+', label:'Produtos disponíveis' },{ value:'4.9★', label:'Avaliação média' }], catsSec:{ badge:'Categorias', title:'O que procura\nem hoje?', sub:'' }, featSec:{ badge:'Porquê Belle', title:'A diferença que\nse sente.' }, depsSec:{ badge:'Depoimentos reais', title:'O que dizem as\nnossas clientes' }, ctaSec:{ emoji:'✨', title:'Beleza que\nmerece.', sub:'Descubra o catálogo completo Belle.', btn:'Ver Catálogo →' } },
+  features:[
+    { emoji:'🌿', title:'100% Autêntico', desc:'Todos os produtos são originais, com certificado de autenticidade garantido.' },
+    { emoji:'🚚', title:'Entrega Rápida', desc:'Entrega em Luanda em 24-48h. Envios para todo o território nacional.' },
+    { emoji:'💳', title:'Pagamento Fácil', desc:'Transferência, Multicaixa Express ou pagamento na entrega. Sem complicações.' },
+    { emoji:'🔄', title:'Devolução 30 dias', desc:'Não ficou satisfeita? Devolvemos o dinheiro, sem perguntas.' }
+  ],
+  testimonials:[
+    { stars:5, text:'O Sérum Vitamina C transformou a minha pele em menos de 3 semanas! As manchas estão visivelmente mais claras.', name:'Joana M.', loc:'Luanda · Skincare', av:'👩🏿' },
+    { stars:5, text:'O Belle Noir é simplesmente incrível. Recebo elogios sempre que o uso. A duração é fantástica!', name:'Sílvia P.', loc:'Benguela · Perfumes', av:'👩🏽' },
+    { stars:5, text:'Entrega rápida, produtos bem embalados e qualidade que superou as expectativas. Já voltei a encomendar!', name:'Carla A.', loc:'Luanda · Maquilhagem', av:'👩🏾' },
+    { stars:5, text:'A paleta Sahara é uma obra de arte. As cores são super pigmentadas e ficam lindas no meu tom de pele.', name:'Miriam K.', loc:'Luanda · Maquilhagem', av:'👩🏿‍🦱' }
+  ],
+  sobre:{ hero:{ title:'Beleza que\ninspira.', sub:'Desde 2019 que levamos os melhores cosméticos até à mulher angolana.' }, mission:'"Cada mulher merece sentir-se bela. A nossa missão é garantir que tem acesso aos melhores produtos para cuidar de si, com qualidade e a um preço justo."', story:'A Belle nasceu de um sonho simples: tornar cosméticos de qualidade acessíveis a todas as mulheres angolanas. O que começou como um pequeno negócio em Luanda cresceu para se tornar uma das referências no sector de cosméticos em Angola.', stats:[{ value:'2019', label:'Fundação' },{ value:'2.5K+', label:'Clientes' },{ value:'150+', label:'Marcas' }], faq:[{ q:'Os produtos são originais?', a:'Sim, todos os produtos Belle são 100% originais, importados directamente dos fabricantes autorizados.' },{ q:'Qual é o prazo de entrega?', a:'Em Luanda, entregamos em 24-48 horas. Para o resto do país, 3-5 dias úteis.' },{ q:'Como posso pagar?', a:'Aceitamos transferência bancária (BFA), Multicaixa Express e pagamento na entrega.' },{ q:'Posso devolver um produto?', a:'Sim! Política de devolução de 30 dias, sem perguntas.' }] },
+  categories:[
+    { id:1, name:'Cuidado da Pele', slug:'pele',        emoji:'✨', color:'#e8609a', active:true },
+    { id:2, name:'Maquilhagem',     slug:'maquilhagem', emoji:'💄', color:'#9b46d4', active:true },
+    { id:3, name:'Cabelo',          slug:'cabelo',      emoji:'💫', color:'#06d6a0', active:true },
+    { id:4, name:'Perfumes',        slug:'perfumes',    emoji:'🌸', color:'#ffd166', active:true },
+    { id:5, name:'Corpo',           slug:'corpo',       emoji:'🧴', color:'#ff9f43', active:true },
+    { id:6, name:'Kits & Presentes',slug:'kits',        emoji:'🎁', color:'#ff8fab', active:true }
+  ],
+  products:[
+    { id:1,  cid:1, name:'Sérum Vitamina C Glow',      emoji:'💎', price:4500, orig:6000, stock:15, featured:true,  active:true, tag:'promo',      desc:'Sérum concentrado com 20% Vitamina C pura. Ilumina, uniformiza o tom e reduz manchas em 4 semanas.', hl:['Vitamina C 20% estabilizada','Reduz manchas em 4 semanas','Acção antioxidante','Para todos os tipos de pele'], image:'' },
+    { id:2,  cid:1, name:'Creme Hidratante 48h',        emoji:'🌿', price:3800, orig:0,    stock:22, featured:true,  active:true, tag:'bestseller', desc:'Hidratação profunda com ácido hialurónico triplo e manteiga de karité africano.', hl:['Ácido hialurónico triplo','Karité africano puro','Hidratação 48h','Testado dermatologicamente'], image:'' },
+    { id:3,  cid:1, name:'Tónico Micelar Rosé',         emoji:'🌹', price:2900, orig:3500, stock:18, featured:false, active:true, tag:'promo',      desc:'Água micelar com extrato de rosas. Remove maquilhagem e equilibra o pH da pele.', hl:['Água de rosas natural','Remove maquilhagem','Equilíbrio de pH','Sem álcool'], image:'' },
+    { id:4,  cid:1, name:'Protetor Solar SPF 50+',      emoji:'☀️', price:3200, orig:0,    stock:30, featured:false, active:true, tag:'',           desc:'Proteção solar de amplo espectro, textura ultra-leve. Sem resíduo branco.', hl:['FPS 50+ UV-A e UV-B','Textura ultra-leve','Sem resíduo branco','Resistente ao suor'], image:'' },
+    { id:5,  cid:2, name:'Base Fluida HD 40 Tons',      emoji:'🎨', price:5500, orig:7000, stock:12, featured:true,  active:true, tag:'promo',      desc:'Base de alta cobertura com acabamento natural matte. 40 tons formulados para peles africanas.', hl:['40 tons inclusivos','Cobertura total','Acabamento matte','Resistente até 16h'], image:'' },
+    { id:6,  cid:2, name:'Batom Mate Velvet',           emoji:'💋', price:2400, orig:0,    stock:25, featured:false, active:true, tag:'novo',       desc:'Batom de longa duração com fórmula mate aveludada e vitamina E. 16 cores.', hl:['Fórmula mate-hidratante','12h de duração','Vitamina E','16 cores'], image:'' },
+    { id:7,  cid:2, name:'Paleta Sahara 16 Tons',       emoji:'🏜️', price:6800, orig:8500, stock:5,  featured:true,  active:true, tag:'destaque',   desc:'16 tons quentes inspirados nos pôr do sol africanos. Matte e shimmer.', hl:['16 sombras premium','Matte + Shimmer','Ultra-pigmentação','Inspiração africana'], image:'' },
+    { id:8,  cid:2, name:'Máscara Volume+ Waterproof',  emoji:'👁️', price:3100, orig:0,    stock:18, featured:false, active:true, tag:'',           desc:'Máscara que multiplica o volume até 3x. Fórmula waterproof 24h.', hl:['Waterproof 24h','Volume x3','Pente de precisão','Não transfere'], image:'' },
+    { id:9,  cid:3, name:'Óleo de Argan Premium',       emoji:'✨', price:4200, orig:5500, stock:20, featured:true,  active:true, tag:'bestseller', desc:'Óleo 100% puro de argan marroquino prensado a frio. Elimina frizz.', hl:['100% puro','Elimina frizz','Brilho intenso','Seco ou molhado'], image:'' },
+    { id:10, cid:3, name:'Máscara Reparadora Intensa',   emoji:'💆', price:3600, orig:0,    stock:14, featured:false, active:true, tag:'',           desc:'Tratamento intensivo com queratina vegetal e proteínas da seda.', hl:['Queratina vegetal','Proteínas da seda','Repara danos','Resultado em 1 uso'], image:'' },
+    { id:11, cid:4, name:'Belle Noir EDP 50ml',          emoji:'🖤', price:8500, orig:10000,stock:7,  featured:true,  active:true, tag:'destaque',   desc:'Fragrância signature de Belle. Baunilha negra, âmbar e sândalo.', hl:['Notas: Baunilha · Âmbar · Sândalo','EDP premium','Duração 8-10h','Frasco exclusivo'], image:'' },
+    { id:12, cid:4, name:'Rose Sauvage EDT 30ml',        emoji:'🌺', price:6200, orig:0,    stock:11, featured:false, active:true, tag:'novo',       desc:'Fragrância floral com notas de rosa, neroli e almíscar branco.', hl:['Rosa · Neroli · Almíscar','Concentração EDT','Duração 6-8h','Uso diário'], image:'' },
+    { id:13, cid:5, name:'Esfoliante Café & Cana',      emoji:'☕', price:2800, orig:0,    stock:35, featured:false, active:true, tag:'',           desc:'Esfoliante natural com café arábico e açúcar de cana orgânico.', hl:['Café arábico','Açúcar de cana orgânico','Activa circulação','Pele de seda'], image:'' },
+    { id:14, cid:5, name:'Manteiga de Karité 200g',     emoji:'🌰', price:3400, orig:4200, stock:28, featured:false, active:true, tag:'promo',      desc:'Manteiga 100% natural de karité africano, produção artesanal.', hl:['100% karité africano','Produção artesanal','Peles muito secas','Sem parabenos'], image:'' },
+    { id:15, cid:6, name:'Kit Skincare Iniciante',       emoji:'🎁', price:9500, orig:12500,stock:8,  featured:true,  active:true, tag:'promo',      desc:'Kit completo para começar a rotina de skincare Belle. 4 produtos essenciais.', hl:['4 produtos essenciais','Embalagem de oferta','Poupa 3.000 Kz','Ideal para presentes'], image:'' },
+    { id:16, cid:6, name:'Kit Luxury Belle Collection',  emoji:'👑', price:15000,orig:0,    stock:5,  featured:false, active:true, tag:'destaque',   desc:'A experiência Belle completa: Perfume Belle Noir EDP + Base + Paleta Sahara.', hl:['3 produtos premium','Caixa exclusiva','Laço personalizável','Entrega especial'], image:'' }
+  ]
+};
+
+/* ── CMS ── */
+const CMS = {
+  _d: null,
+  _m(def, src) {
+    const r = Object.assign({}, def);
+    for (const k in src) {
+      if (Array.isArray(src[k])) r[k] = src[k];
+      else if (src[k] && typeof src[k] === 'object' && def[k] && typeof def[k] === 'object' && !Array.isArray(def[k])) r[k] = this._m(def[k], src[k]);
+      else r[k] = src[k];
+    }
+    return r;
+  },
+  load() {
+    if (this._d) return this._d;
+    try { const s = localStorage.getItem('bl_cms'); this._d = s ? this._m(DATA_DEFAULTS, JSON.parse(s)) : Object.assign({}, DATA_DEFAULTS); }
+    catch(e) { this._d = Object.assign({}, DATA_DEFAULTS); }
+    return this._d;
+  },
+  save() { localStorage.setItem('bl_cms', JSON.stringify(this._d)); window.dispatchEvent(new CustomEvent('bl:cms')); },
+  get(path) { const d=this.load(); return path.split('.').reduce((o,k)=>o&&o[k]!==undefined?o[k]:undefined,d); },
+  set(path, val) {
+    const d=this.load(); const parts=path.split('.'); let o=d;
+    for (let i=0;i<parts.length-1;i++){if(!o[parts[i]])o[parts[i]]={};o=o[parts[i]];}
+    o[parts[parts.length-1]]=val; this.save();
+  },
+  store()        { return this.get('store') || DATA_DEFAULTS.store; },
+  home()         { return this.get('home')  || DATA_DEFAULTS.home; },
+  products()     { return this.get('products') || []; },
+  categories()   { return (this.get('categories')||[]).filter(c=>c.active!==false); },
+  allCats()      { return this.get('categories') || []; },
+  features()     { return this.get('features') || []; },
+  testimonials() { return this.get('testimonials') || []; },
+  sobre()        { return this.get('sobre') || {}; },
+  getProduct(id) { return this.products().find(p=>p.id===+id)||null; },
+  featured()     { return this.products().filter(p=>p.featured&&p.active!==false&&p.stock>0); },
+  saveProduct(p) {
+    const list=this.get('products')||[];
+    if (p.id) { const i=list.findIndex(x=>x.id===p.id); if(i>-1)list[i]=p; else list.push(p); }
+    else { p.id=Date.now(); list.push(p); }
+    this.set('products',list); return p;
+  },
+  deleteProduct(id) { this.set('products',(this.get('products')||[]).filter(p=>p.id!==+id)); },
+  saveCat(c) {
+    const list=this.get('categories')||[];
+    if (c.id) { const i=list.findIndex(x=>x.id===c.id); if(i>-1)list[i]=c; else list.push(c); }
+    else { c.id=Date.now(); list.push(c); }
+    this.set('categories',list); return c;
+  },
+  deleteCat(id)  { this.set('categories',(this.get('categories')||[]).filter(c=>c.id!==+id)); },
+};
+
+/* ── ORDERS ── */
+const Orders = {
+  K: 'bl_orders',
+  _ref() { return `BL-${new Date().toISOString().slice(0,10).replace(/-/g,'')}-${String(Math.floor(Math.random()*9000)+1000)}`; },
+  get()  { try { return JSON.parse(localStorage.getItem(this.K)||'[]'); } catch { return []; } },
+  save(l){ localStorage.setItem(this.K, JSON.stringify(l)); },
+  create(data) {
+    const o={...data, reference:this._ref(), status:'pending', payment_status:'unpaid', created_at:new Date().toISOString()};
+    const l=this.get(); l.unshift(o); this.save(l); return o;
+  },
+  track(ref) { return this.get().find(o=>o.reference.toUpperCase()===ref.toUpperCase())||null; },
+  updateStatus(ref,status,pay) {
+    const l=this.get(); const o=l.find(x=>x.reference===ref);
+    if(o){o.status=status;if(pay)o.payment_status=pay;o.updated_at=new Date().toISOString();}
+    this.save(l); return o;
+  },
+  stats() {
+    const l=this.get();
+    const today=new Date().toISOString().slice(0,10);
+    return {
+      total:l.length, pending:l.filter(o=>o.status==='pending').length,
+      today:l.filter(o=>o.created_at?.startsWith(today)).length,
+      revenue:l.filter(o=>o.status!=='cancelled').reduce((s,o)=>s+(o.total||0),0),
+      clients:new Set(l.map(o=>o.customer?.phone).filter(Boolean)).size
+    };
+  }
+};
+
+/* ── SETTINGS ── */
+const Settings = {
+  K:'bl_settings',
+  get()  { try { return JSON.parse(localStorage.getItem(this.K)||'{}'); } catch { return {}; } },
+  set(d) { localStorage.setItem(this.K,JSON.stringify({...this.get(),...d})); },
+  val(k) { return this.get()[k]||''; },
+  verifyPin(pin) { return pin===(this.val('pin')||'123456789012'); },
+  setPin(p)      { this.set({pin:p}); }
+};
+
+/* ── CART ── */
+const Cart = {
+  K:'bl_cart',
+  get()   { try{return JSON.parse(localStorage.getItem(this.K)||'[]');}catch{return[];} },
+  count() { return this.get().reduce((s,i)=>s+(+i.qty||1),0); },
+  total() { return this.get().reduce((s,i)=>s+((+i.price||0)*(+i.qty||1)),0); },
+  clear() { localStorage.removeItem(this.K); }
+};
+
+/* ── WISHLIST ── */
+const Wishlist = {
+  K:'bl_wl',
+  get()    { try{return JSON.parse(localStorage.getItem(this.K)||'[]');}catch{return[];} },
+  has(id)  { return this.get().includes(+id); },
+  toggle(id){ const l=this.get(),i=l.indexOf(+id); if(i>-1)l.splice(i,1); else l.push(+id); localStorage.setItem(this.K,JSON.stringify(l)); return i===-1; }
+};
+
+/* ── SESSION ── */
+const Session = {
+  K:'bl_session',
+  get()   { try{return JSON.parse(localStorage.getItem(this.K)||'null');}catch{return null;} },
+  set(d)  { localStorage.setItem(this.K,JSON.stringify(d)); },
+  clear() { localStorage.removeItem(this.K); }
+};
+
+/* ── AUTH ── */
+const Auth = {
+  K:'bl_admin_token',
+  set(t)  { localStorage.setItem(this.K,t); },
+  get()   { return localStorage.getItem(this.K)||''; },
+  clear() { localStorage.removeItem(this.K); }
+};
+
+const kz = (n) => { const s=CMS.store(); return (s.currency||'Kz')+' '+Number(n||0).toLocaleString('pt'); };
+const fmtDate = (d) => { try{return new Date(d).toLocaleDateString('pt',{day:'2-digit',month:'short',year:'numeric'});}catch{return d||'—';} };
+const slugify = (s) => s.toLowerCase().normalize('NFD').replace(/[\u0300-\u036f]/g,'').replace(/[^a-z0-9]+/g,'-').replace(/(^-|-$)/g,'');
+const ORDER_STATUS = {
+  pending:  {label:'Pendente',   color:'var(--yellow)',  bg:'rgba(255,209,102,.1)', icon:'⏳'},
+  confirmed:{label:'Confirmado', color:'var(--teal)',    bg:'rgba(6,214,160,.1)',   icon:'✅'},
+  shipped:  {label:'Em entrega', color:'var(--blue)',    bg:'rgba(61,158,255,.1)',  icon:'🚚'},
+  delivered:{label:'Entregue',   color:'var(--teal)',    bg:'rgba(6,214,160,.08)', icon:'📦'},
+  cancelled:{label:'Cancelado',  color:'var(--red)',     bg:'rgba(255,71,87,.1)',  icon:'❌'}
+};
+</script>
 
 <!-- ══ SCRIPT 3: Admin logic ══ -->
 <script>
 'use strict';
 
 /* ── UTILS ── */
-function kzA(n) {
-  try { var s=CMS.store(); return (s.currency||'Kz')+' '+Number(n||0).toLocaleString('pt'); } catch(e) { return 'Kz '+Number(n||0).toLocaleString('pt'); }
-}
-function fdA(d) { try { return new Date(d).toLocaleDateString('pt',{day:'2-digit',month:'short',year:'numeric'}); } catch(e) { return d||'—'; } }
+function kzA(n) { try { return kz(n); } catch(e) { return 'Kz '+Number(n||0).toLocaleString('pt'); } }
+function fdA(d)  { return fmtDate(d); }
 function slugify(s) { return s.toLowerCase().normalize('NFD').replace(/[\u0300-\u036f]/g,'').replace(/[^a-z0-9]+/g,'-').replace(/(^-|-$)/g,''); }
 
 var _toast_t = null;
@@ -597,7 +778,7 @@ document.querySelectorAll('.mo').forEach(function(el) {
   el.addEventListener('click', function(e) { if(e.target===el){el.classList.remove('on');document.body.style.overflow='';} });
 });
 
-var OS = {
+// OS alias for ORDER_STATUS
   pending:   { l:'Pendente',   c:'var(--yellow)', b:'rgba(255,209,102,.1)', ic:'⏳' },
   confirmed: { l:'Confirmado', c:'var(--teal)',   b:'rgba(6,214,160,.1)',   ic:'✅' },
   shipped:   { l:'Em entrega', c:'var(--blue)',   b:'rgba(61,158,255,.1)',   ic:'🚚' },
@@ -679,8 +860,8 @@ function renderDash() {
     if(!encs.length){deEl.innerHTML='<div class="empty"><i class="fa-solid fa-inbox"></i><p>Sem pedidos ainda</p></div>';}
     else {
       var rows=encs.map(function(o){
-        var st=OS[o.status]||OS.pending;
-        return '<tr><td><div class="tdn">'+o.reference+'</div><div class="tds">'+fdA(o.created_at)+'</div></td><td><div style="font-size:.82rem;font-weight:600">'+(o.customer&&o.customer.name?o.customer.name:'—')+'</div></td><td><strong>'+kzA(o.total)+'</strong></td><td><span class="badge" style="background:'+st.b+';color:'+st.c+'">'+st.ic+' '+st.l+'</span></td><td><button class="btn btn-o btn-sm btn-ico" onclick="go(\'encs\');setTimeout(function(){togDet(\''+o.reference+'\');},200)"><i class="fa-solid fa-eye"></i></button></td></tr>';
+        var st=ORDER_STATUS[o.status]||ORDER_STATUS.pending;
+        return '<tr><td><div class="tdn">'+o.reference+'</div><div class="tds">'+fdA(o.created_at)+'</div></td><td><div style="font-size:.82rem;font-weight:600">'+(o.customer&&o.customer.name?o.customer.name:'—')+'</div></td><td><strong>'+kzA(o.total)+'</strong></td><td><span class="badge" style="background:'+st.bg+';color:'+st.color+'">'+st.icon+' '+st.label+'</span></td><td><button class="btn btn-o btn-sm btn-ico" onclick="go(\'encs\');setTimeout(function(){togDet(\''+o.reference+'\');},200)"><i class="fa-solid fa-eye"></i></button></td></tr>';
       }).join('');
       deEl.innerHTML='<div class="tw"><table><thead><tr><th>Ref</th><th>Cliente</th><th>Total</th><th>Estado</th><th></th></tr></thead><tbody>'+rows+'</tbody></table></div>';
     }
@@ -721,8 +902,8 @@ function renderEncs() {
     Object.keys(grupos).forEach(function(dia){
       html+='<tr class="day-hdr"><td colspan="6">'+(dia===hoje?'🟢 Hoje — ':'')+dia+' <span style="color:var(--muted2)">('+grupos[dia].length+')</span></td></tr>';
       grupos[dia].forEach(function(o){
-        var st=OS[o.status]||OS.pending;
-        var opts=Object.keys(OS).map(function(k){return '<option value="'+k+'"'+(o.status===k?' selected':'')+'>'+OS[k].ic+' '+OS[k].l+'</option>';}).join('');
+        var st=ORDER_STATUS[o.status]||ORDER_STATUS.pending;
+        var opts=Object.keys(ORDER_STATUS).map(function(k){return '<option value="'+k+'"'+(o.status===k?' selected':'')+'>'+ORDER_STATUS[k].icon+' '+ORDER_STATUS[k].label+'</option>';}).join('');
         html+='<tr>'
           +'<td><div class="tdn">'+o.reference+'</div><div class="tds">'+fdA(o.created_at)+'</div></td>'
           +'<td><div style="font-size:.82rem;font-weight:600">'+(o.customer&&o.customer.name?o.customer.name:'—')+'</div><div class="tds">'+(o.customer&&o.customer.phone?o.customer.phone:'')+'</div></td>'
@@ -745,7 +926,7 @@ function renderEncs() {
 }
 function togDet(ref){var r=document.getElementById('dtr-'+ref);if(!r)return;var o=r.classList.contains('on');document.querySelectorAll('.dtr.on').forEach(function(x){if(x.id!=='dtr-'+ref)x.classList.remove('on');});r.classList.toggle('on',!o);}
 function chgStatus(ref,st){try{Orders.updateStatus(ref,st);loadStats();syncPend();toast('Estado actualizado','ok');}catch(e){toast('Erro','err');}}
-function waEnc(ref){try{var o=Orders.get().find(function(x){return x.reference===ref;});if(!o)return;var wa=(o.customer&&o.customer.phone?o.customer.phone:'').replace(/\D/g,'')||CMS.store().whatsapp.replace(/\D/g,'');var msg='Olá '+(o.customer&&o.customer.name?o.customer.name:'')+', a sua encomenda *'+ref+'* está '+OS[o.status].l+'. Total: '+kzA(o.total);window.open('https://wa.me/'+wa+'?text='+encodeURIComponent(msg),'_blank');}catch(e){}}
+function waEnc(ref){try{var o=Orders.get().find(function(x){return x.reference===ref;});if(!o)return;var wa=(o.customer&&o.customer.phone?o.customer.phone:'').replace(/\D/g,'')||CMS.store().whatsapp.replace(/\D/g,'');var msg='Olá '+(o.customer&&o.customer.name?o.customer.name:'')+', a sua encomenda *'+ref+'* está '+ORDER_STATUS[o.status].label+'. Total: '+kzA(o.total);window.open('https://wa.me/'+wa+'?text='+encodeURIComponent(msg),'_blank');}catch(e){}}
 function fEncs(v){_eSearch=v.toLowerCase().trim();renderEncs();}
 function fEncE(v){_eEst=v;renderEncs();}
 
