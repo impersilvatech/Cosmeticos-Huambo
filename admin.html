@@ -674,10 +674,10 @@ const CMS = {
 const Orders = {
   K: 'bl_orders',
   _ref() { return `BL-${new Date().toISOString().slice(0,10).replace(/-/g,'')}-${String(Math.floor(Math.random()*9000)+1000)}`; },
-  get()  { try { return JSON.parse(localStorage.getItem(this.K)||'[]'); } catch { return []; } },
+  get()  { try { return JSON.parse(localStorage.getItem(this.K)||'[]'); } catch(e) { return []; } },
   save(l){ localStorage.setItem(this.K, JSON.stringify(l)); },
   create(data) {
-    const o={...data, reference:this._ref(), status:'pending', payment_status:'unpaid', created_at:new Date().toISOString()};
+    const o = Object.assign({}, data, { reference:this._ref(), status:'pending', payment_status:'unpaid', created_at:new Date().toISOString() });
     const l=this.get(); l.unshift(o); this.save(l); return o;
   },
   track(ref) { return this.get().find(o=>o.reference.toUpperCase()===ref.toUpperCase())||null; },
@@ -691,9 +691,9 @@ const Orders = {
     const today=new Date().toISOString().slice(0,10);
     return {
       total:l.length, pending:l.filter(o=>o.status==='pending').length,
-      today:l.filter(o=>o.created_at?.startsWith(today)).length,
-      revenue:l.filter(o=>o.status!=='cancelled').reduce((s,o)=>s+(o.total||0),0),
-      clients:new Set(l.map(o=>o.customer?.phone).filter(Boolean)).size
+      today:l.filter(function(o){return o.created_at&&o.created_at.startsWith(today);}).length,
+      revenue:l.filter(function(o){return o.status!=='cancelled';}).reduce(function(s,o){return s+(o.total||0);},0),
+      clients:new Set(l.map(function(o){return o.customer&&o.customer.phone?o.customer.phone:null;}).filter(Boolean)).size
     };
   }
 };
@@ -701,8 +701,8 @@ const Orders = {
 /* ── SETTINGS ── */
 const Settings = {
   K:'bl_settings',
-  get()  { try { return JSON.parse(localStorage.getItem(this.K)||'{}'); } catch { return {}; } },
-  set(d) { localStorage.setItem(this.K,JSON.stringify({...this.get(),...d})); },
+  get()  { try { return JSON.parse(localStorage.getItem(this.K)||'{}'); } catch(e) { return {}; } },
+  set(d) { localStorage.setItem(this.K,JSON.stringify(Object.assign({},this.get(),d))); },
   val(k) { return this.get()[k]||''; },
   verifyPin(pin) { return pin===(this.val('pin')||'123456789012'); },
   setPin(p)      { this.set({pin:p}); }
